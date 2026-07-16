@@ -1,0 +1,163 @@
+/* START OF FILE group.css */
+
+/* ========================================
+   Right Panel Group Theming (右パネルのグループテーマ配色) - 修正版
+======================================== */
+
+/* テーマカラーの定義 */
+:root {
+    --theme-display-bg: #eef2ff;    /* 表示設定: Indigo系 */
+    --theme-display-border: #c7d2fe;
+    --theme-display-text: #3730a3;
+    --theme-display-icon: #4f46e5;
+
+    --theme-edit-bg: #f0fdf4;       /* チャート編集: Green系 */
+    --theme-edit-border: #bbf7d0;
+    --theme-edit-text: #166534;
+    --theme-edit-icon: #22c55e;
+    
+    --theme-distribution-bg: #fffbeb; /* 作業配分設定: Amber系 */
+    --theme-distribution-border: #fde68a;
+    --theme-distribution-text: #92400e;
+    --theme-distribution-icon: #f59e0b;
+
+    --theme-schedule-bg: #fef2f2;    /* 稼働時間設定: Red系 */
+    --theme-schedule-border: #fecaca;
+    --theme-schedule-text: #991b1b;
+    --theme-schedule-icon: #ef4444;
+
+    --theme-data-bg: #f8fafc;       /* データ管理: Gray系 (デフォルト) */
+    --theme-data-border: #e2e8f0;
+    --theme-data-text: #334155;
+    --theme-data-icon: #64748b;
+    
+    --theme-danger-bg: #fef2f2;
+    --theme-danger-border: #fecaca;
+    --theme-danger-text: #991b1b;
+    --theme-danger-icon: #ef4444;
+}
+
+/* ========================================
+   パネルタイトルのテーマ適用
+======================================== */
+/* 左パネルのパネルタイトル */
+.control-panel .panel-title {
+    position: relative;
+    padding-bottom: 6px;
+    border-bottom: 2px solid;
+    transition: all 0.3s ease;
+    margin-top: 20px; /* 全タイトルにデフォルト上マージン */
+}
+
+/* 各コントロールパネルの最初のタイトルのみ上マージンをなくす */
+#ganttPanelControls > .panel-title:first-of-type,
+#distributionPanelControls > .panel-title:first-of-type,
+#schedulePanelControls > .panel-title:first-of-type {
+    margin-top: 0;
+}
+
+/* 各テーマごとのタイトル色と下線色を再設定 */
+.panel-title.theme-display { 
+    color: var(--theme-display-text); 
+    border-bottom-color: var(--theme-display-border);
+}
+
+.panel-title.theme-edit { 
+    color: var(--theme-edit-text); 
+    border-bottom-color: var(--theme-edit-border);
+}
+
+.panel-title.theme-distribution { 
+    color: var(--theme-distribution-text); 
+    border-bottom-color: var(--theme-distribution-border);
+}
+
+.panel-title.theme-schedule { 
+    color: var(--theme-schedule-text); 
+    border-bottom-color: var(--theme-schedule-border);
+}
+
+.panel-title.theme-danger {
+    color: var(--theme-danger-text);
+    border-bottom-color: var(--theme-danger-border);
+}
+
+/* ========================================
+   カテゴリヘッダーのテーマ適用
+======================================== */
+.data-category .category-header {
+    /* border-leftは削除 — styles.css の ::before アクセントバーに一元化 */
+    background: var(--background-subtle);
+    color: var(--text-secondary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.data-category .category-header .category-icon i {
+    transition: color 0.2s ease;
+}
+
+/* ========================================
+   テーマ別スタイル定義
+   ─ border-leftは持たず、ホバー/アクティブの
+     背景・テキスト・アイコン色のみ管理する。
+     左端バーは styles.css の ::before に一元化。
+======================================== */
+
+/* --- display (Indigo) --- */
+.theme-display .category-header .category-icon i { color: var(--theme-display-icon); }
+.theme-display .category-header:hover { background-color: var(--theme-display-bg); color: var(--theme-display-text); }
+.theme-display .category-header.active {
+    background-color: var(--theme-display-bg);
+    color: var(--theme-display-text);
+}
+
+/* --- edit (Green) --- */
+.theme-edit .category-header .category-icon i { color: var(--theme-edit-icon); }
+.theme-edit .category-header:hover { background-color: var(--theme-edit-bg); color: var(--theme-edit-text); }
+.theme-edit .category-header.active {
+    background-color: var(--theme-edit-bg);
+    color: var(--theme-edit-text);
+}
+
+/* --- distribution (Amber) --- */
+.theme-distribution .category-header .category-icon i { color: var(--theme-distribution-icon); }
+.theme-distribution .category-header:hover { background-color: var(--theme-distribution-bg); color: var(--theme-distribution-text); }
+.theme-distribution .category-header.active {
+    background-color: var(--theme-distribution-bg);
+    color: var(--theme-distribution-text);
+}
+/* distribution テーマ: 展開時の左バーをAmber系に */
+.data-category.theme-distribution:has(> .category-header.active)::before {
+    background: var(--theme-distribution-icon);
+}
+
+/* --- schedule (Red) --- */
+.theme-schedule .category-header .category-icon i { color: var(--theme-schedule-icon); }
+.theme-schedule .category-header:hover { background-color: var(--theme-schedule-bg); color: var(--theme-schedule-text); }
+.theme-schedule .category-header.active {
+    background-color: var(--theme-schedule-bg);
+    color: var(--theme-schedule-text);
+}
+.data-category.theme-schedule:has(> .category-header.active)::before {
+    background: var(--theme-schedule-icon);
+}
+
+/* --- data (Gray) --- */
+.theme-data .category-header .category-icon i { color: var(--theme-data-icon); }
+.theme-data .category-header:hover { background-color: var(--theme-data-bg); color: var(--theme-data-text); }
+.theme-data .category-header.active {
+    background-color: var(--theme-data-bg);
+    color: var(--theme-data-text);
+}
+
+/* --- danger (Red/warning) --- */
+.theme-danger .category-header .category-icon i { color: var(--theme-danger-icon); }
+.theme-danger .category-header:hover { background-color: var(--theme-danger-bg); color: var(--theme-danger-text); }
+.theme-danger .category-header.active {
+    background-color: var(--theme-danger-bg);
+    color: var(--theme-danger-text);
+}
+
+.category-header.active .category-toggle {
+    color: inherit;
+}
+/* END OF FILE group.css */

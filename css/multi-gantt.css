@@ -1,0 +1,242 @@
+/* ================================================
+   multi-gantt.css  ―  比較ガントチャート専用スタイル
+   認知心理学原則：
+   ・チャンク化：左パネル（作業者選択）＋右（チャート）の明確な役割分離
+   ・ステータス表示一貫性：改善前=ダーク、改善後=レッドの既存色体系を継承
+   ・プログレッシブディスクロージャー：凡例は展開可能コンテナ内に格納
+================================================ */
+
+/* ── パネル内モードボタン ── */
+.mg-mode-buttons {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 4px;
+}
+
+.mg-mode-btn {
+    flex: 1;
+    padding: 8px 6px;
+    border: 1.5px solid var(--border-color, #d1d5db);
+    border-radius: 7px;
+    background: #ffffff;
+    color: var(--text-secondary, #64748b);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.18s ease;
+    font-family: inherit;
+}
+
+.mg-mode-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.mg-mode-btn.active[data-mode="current"] {
+    background: var(--current-color, #1f2937);
+    border-color: var(--current-color, #1f2937);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(31,41,55,0.25);
+}
+
+.mg-mode-btn.active[data-mode="improved"] {
+    background: var(--improved-color, #dc2626);
+    border-color: var(--improved-color, #dc2626);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(220,38,38,0.25);
+}
+
+/* ── 作業者リスト空状態 ── */
+.mg-empty-list {
+    padding: 16px 10px;
+    text-align: center;
+    color: var(--text-muted, #9ca3af);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-direction: column;
+}
+
+.mg-empty-list i {
+    font-size: 22px;
+    opacity: 0.45;
+}
+
+/* ── 凡例アイテム ── */
+.mg-legend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mg-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-secondary, #475569);
+}
+
+.mg-legend-swatch {
+    width: 36px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.mg-legend-swatch.normal   { background: var(--current-color, #1f2937); opacity: 0.82; }
+.mg-legend-swatch.monitor  { background: transparent; border: 1.5px dashed var(--current-color, #1f2937); }
+.mg-legend-swatch.hold     { background: rgba(31,41,55,0.18); border-top: 1.5px solid var(--current-color,#1f2937); }
+.mg-legend-swatch.wait     { background: transparent; border-top: 1.5px solid var(--current-color,#1f2937); border-bottom: 1.5px solid var(--current-color,#1f2937); }
+.mg-legend-swatch.auto     { background: rgba(100,116,139,0.15); border: 1px dashed #94a3b8; }
+.mg-legend-swatch.walk     { background: repeating-linear-gradient(45deg, rgba(100,116,139,0.25) 0px, rgba(100,116,139,0.25) 3px, transparent 3px, transparent 6px); border: 1px solid rgba(100,116,139,0.3); }
+
+/* ── タブコンテンツ：ヘッダー ── */
+.multi-gantt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--background-white, #ffffff);
+    border-bottom: 1px solid var(--border-light, #e5e7eb);
+    flex-shrink: 0;
+    gap: 12px;
+}
+
+.multi-gantt-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary, #0f172a);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.multi-gantt-title i {
+    color: var(--primary-color, #2563eb);
+    font-size: 14px;
+}
+
+/* ヘッダー右側のインフォエリア */
+.mg-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mg-info-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.mg-info-chip.mode-current {
+    background: rgba(31,41,55,0.08);
+    color: var(--current-color, #1f2937);
+    border-color: rgba(31,41,55,0.2);
+}
+
+.mg-info-chip.mode-improved {
+    background: rgba(220,38,38,0.08);
+    color: var(--improved-color, #dc2626);
+    border-color: rgba(220,38,38,0.2);
+}
+
+/* ── チャートラッパー ── */
+.multi-gantt-chart-wrapper {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    background: var(--background-subtle, #f8fafc);
+    min-height: 0;
+}
+
+/* ── キャンバスコンテナ ── */
+.mg-canvas-container {
+    background: #ffffff;
+    border: 1px solid var(--border-light, #e5e7eb);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: inline-block; /* shrink-wrap to canvas size */
+    min-width: 100%;
+}
+
+.mg-canvas-container canvas {
+    display: block;
+    cursor: default;
+}
+
+/* ── 空状態コンテンツ（タブ内） ── */
+.mg-main-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-muted, #9ca3af);
+    text-align: center;
+    gap: 12px;
+}
+
+.mg-main-empty i {
+    font-size: 40px;
+    opacity: 0.3;
+}
+
+.mg-main-empty h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-secondary, #64748b);
+    margin: 0;
+}
+
+.mg-main-empty p {
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 0;
+    max-width: 320px;
+}
+
+/* ── タブ全体レイアウト ──
+   ★ display は .main-tab-content / .main-tab-content.active に委ねる。
+   ここで display:flex を宣言すると ID セレクタ（特異度 0,1,0,0）が
+   クラスの display:none（特異度 0,0,1,0）を上書きし、
+   非アクティブ時に他タブへ侵食する原因となるため削除。         */
+#multiGanttTabContent {
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+/* スクロールバーの統一 */
+.multi-gantt-chart-wrapper::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.multi-gantt-chart-wrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+.multi-gantt-chart-wrapper::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+.multi-gantt-chart-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

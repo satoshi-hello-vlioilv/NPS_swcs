@@ -1,0 +1,6918 @@
+/* START OF FILE styles.css */
+
+/* ========================================
+   CSS Variables & Root Settings - Business Optimized (Updated)
+======================================== */
+:root {
+    /* Primary Colors - Business Professional */
+    --primary-color: #2563eb;
+    --secondary-color: #64748b;
+    --accent-color: #dc2626;
+    --success-color: #059669;
+    --warning-color: #d97706;
+    
+    /* Current/Improved Color System - Unified */
+    --current-color: #1f2937;        /* Black for current state */
+    --current-light: #374151;        
+    --current-accent: #4b5563;       
+    --improved-color: #dc2626;       /* Red for improved state */
+    --improved-light: #ef4444;       
+    --improved-accent: #f87171;      
+    --both-mode-color: #6366f1;
+    
+    /* Schedule Colors - Professional Schedule System */
+    --schedule-bg: #f8fafc;
+    --schedule-work-color: #2563eb;
+    --schedule-break-color: #f59e0b;
+    --schedule-meeting-color: #10b981;
+    --schedule-inspection-color: #8b5cf6;
+    --schedule-cleaning-color: #ef4444;
+    --schedule-other-color: #64748b;
+    
+    /* Hover Color - Unified Yellow System */
+    --hover-color: #fbbf24;          /* Yellow for all hover states */
+    --hover-light: #fde68a;          /* Light yellow for hover highlights */
+    
+    /* Insert/Add Item Color - Orange System */
+    --insert-color: #f97316;         /* Orange for item insertion */
+    --insert-light: #fb923c;         /* Light orange for highlights */
+    --insert-bg: rgba(249, 115, 22, 0.15); /* Semi-transparent orange background */
+    
+    /* Category Colors - Clear Distinction for Distribution Chart */
+    --category-normal-color: #2563eb;    /* Blue for normal work */
+    --category-monitor-color: #059669;   /* Green for monitor work */
+    --category-wait-color: #dc2626;      /* Red for wait work */
+    
+    /* Category Colors - Unified to Current/Improved System (for Gantt) */
+    --monitor-current-color: #374151; /* Monitor in current state: black system */
+    --monitor-improved-color: #7f1d1d; /* Monitor in improved state: red system */
+    --wait-current-color: #4b5563; /* Wait in current state: black system */
+    --wait-improved-color: #991b1b; /* Wait in improved state: red system */
+    
+    /* Background Colors - Clean Business */
+    --background-light: #f8fafc;
+    --background-white: #ffffff;
+    --background-subtle: #f1f5f9;
+    --background-dark: #0f172a;
+    
+    /* Border Colors */
+    --border-color: #e2e8f0;
+    --border-strong: #94a3b8;
+    --border-light: #e5e7eb;
+    
+    /* Text Colors */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    /* Grid Colors */
+    --grid-color: #e2e8f0;
+    --grid-major-color: #94a3b8;
+    
+    /* Interactive Colors */
+    --drag-color: #8b5cf6;
+    
+    /* Shadows - Clean Business */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    /* Layout - Optimized for more content */
+    --row-height: 45px;
+    --compact-spacing: 8px;
+    --micro-spacing: 4px;
+}
+
+/* ========================================
+   Base Styles - Business Clean
+======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-primary);
+    line-height: 1.4;
+    overflow-x: hidden;
+    font-feature-settings: 'kern' 1;
+    font-size: 13px;
+}
+
+/* ========================================
+   Drag & Drop Overlay - Business Style
+======================================== */
+.drag-drop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(37, 99, 235, 0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.drag-drop-content {
+    text-align: center;
+    color: white;
+    padding: 28px;
+    border: 2px dashed rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    max-width: 380px;
+}
+
+.drag-drop-content i {
+    font-size: 42px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.drag-drop-content h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.drag-drop-content p {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* ========================================
+   Header Styles - Business Professional
+======================================== */
+.app-header {
+    background: var(--background-white);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+}
+
+/* ========================================
+   Main Tab Navigation - Business Clean (Unified Design)
+   メインタブのデザインを左パネルと統一（セグメンテッドコントロール風）
+======================================== */
+.main-tab-navigation {
+    display: flex;
+    background: #f1f5f9;          /* slate-100: 全体を統括するニュートラルな背景色 */
+    padding: 4px;                 /* コンテナの内側余白 */
+    border-radius: 8px;           /* コンテナの角丸 */
+    gap: 4px;                     /* タブ間の隙間 */
+    border: 1px solid var(--border-light); /* 境界線を薄く追加して輪郭をはっきりさせる */
+}
+
+.main-tab-button {
+    flex: 1;                      /* 均等幅に */
+    padding: 8px 12px;
+    border: none;                 /* 個別ボーダー削除 */
+    background: transparent;      /* 非アクティブ時は背景透明 */
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 6px;           /* ボタン自体の角丸 */
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    min-width: 160px;             /* 文字が収まるように拡大 */
+    white-space: nowrap;          /* 文字の折り返しを禁止 */
+    justify-content: center;
+}
+
+.main-tab-button:hover {
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-primary);
+}
+
+.main-tab-button.active {
+    background: #ffffff;          /* アクティブ時は白背景 */
+    color: var(--primary-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06); /* 浮き上がり効果 */
+    border-color: transparent;
+}
+
+.main-tab-button i {
+    font-size: 14px;
+}
+
+/* ========================================
+   Main Tab Content
+======================================== */
+.main-tab-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.main-tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========================================
+   Data List Section
+======================================== */
+.data-list-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.data-list-select {
+    min-width: 170px;
+    padding: 7px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--background-white);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.data-list-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-size: 13px;
+}
+
+/* ========================================
+   Layout - Business Grid
+======================================== */
+.app-container {
+    display: grid;
+    grid-template-columns: 17% 83%;
+    height: calc(100vh - 70px);
+    gap: 1px;
+    background-color: var(--border-color);
+    grid-template-rows: 1fr auto;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.main-content {
+    background-color: var(--background-white);
+    overflow: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ========================================
+   Schedule Tab Styles (New - Professional)
+======================================== */
+.schedule-header {
+    background: var(--background-white);
+    border-bottom: 1px solid var(--border-light);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.schedule-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+}
+
+.schedule-controls {
+    display: flex;
+    min-width: 250px;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Schedule Settings Area */
+.schedule-settings-area {
+    background: var(--background-white);
+    border-bottom: 1px solid var(--border-light);
+    padding: 12px 16px;
+}
+
+.schedule-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+    gap: 10px; 
+    max-width: 1400px;
+}
+
+.schedule-setting-card {
+    background: var(--background-white);
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.schedule-setting-card:hover {
+    border-color: var(--schedule-work-color);
+    box-shadow: var(--shadow-md);
+}
+
+.schedule-setting-card:focus-within {
+    border-color: var(--schedule-work-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* Schedule End Time Card - Special Styling */
+.schedule-end-time-card {
+    border-color: var(--success-color);
+    background: rgba(5, 150, 105, 0.02);
+}
+
+.schedule-end-time-card:hover {
+    border-color: var(--success-color);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+}
+
+.schedule-end-icon {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(5, 150, 105, 0.2);
+}
+
+.schedule-end-time-value {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* スケジュール用の特別カードの調整 */
+.schedule-end-time-value span {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--success-color);
+    letter-spacing: -0.025em;
+    text-align: center;
+    display: block;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* Schedule Chart Container */
+.schedule-chart-container {
+    flex: 1;
+    position: relative;
+    padding: 12px 16px;
+    overflow: auto;
+}
+
+.schedule-canvas-container {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: white;
+    overflow: auto;
+    box-shadow: var(--shadow-sm);
+    min-height: 450px;
+}
+
+#scheduleCanvas {
+    border: none;
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+}
+
+/* ========================================
+   Time Slot Management Section (New)
+======================================== */
+.time-slot-list {
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: var(--compact-spacing);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    background: var(--background-white);
+}
+
+.time-slot-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.time-slot-item:last-child {
+    border-bottom: none;
+}
+
+.time-slot-item:hover {
+    background: var(--background-subtle);
+    transform: translateX(2px);
+}
+
+.time-slot-type-indicator {
+    width: 4px;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 0 2px 2px 0;
+}
+
+.time-slot-type-indicator.break {
+    background: var(--schedule-break-color);
+}
+
+.time-slot-type-indicator.meeting {
+    background: var(--schedule-meeting-color);
+}
+
+.time-slot-type-indicator.inspection {
+    background: var(--schedule-inspection-color);
+}
+
+.time-slot-type-indicator.cleaning {
+    background: var(--schedule-cleaning-color);
+}
+
+.time-slot-type-indicator.other {
+    background: var(--schedule-other-color);
+}
+
+.time-slot-content {
+    flex: 1;
+    margin-left: 8px;
+}
+
+.time-slot-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.time-slot-details {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.time-slot-time {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.time-slot-time i {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.time-slot-actions {
+    display: flex;
+    gap: 3px;
+}
+
+/* ========================================
+   Time Slot Modal Styles (New)
+======================================== */
+.time-slot-time-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* ========================================
+   Distribution Chart Styles (Enhanced)
+======================================== */
+.distribution-header {
+    background: var(--background-white);
+    border-bottom: 1px solid var(--border-light);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.distribution-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.025em;
+}
+
+.distribution-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.distribution-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    background: var(--background-white);
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    min-width: 100px;
+}
+
+.distribution-info:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+}
+
+.distribution-info i {
+    color: var(--primary-color);
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.data-count-label {
+    color: var(--text-muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    flex-shrink: 0;
+}
+
+.data-count-value {
+    background: var(--primary-color);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 12px;
+    min-width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.data-count-value.updating {
+    animation: dataCountPulse 0.4s ease-out;
+}
+
+@keyframes dataCountPulse {
+    0% {
+        background: var(--primary-color);
+        transform: scale(1);
+    }
+    50% {
+        background: var(--success-color);
+        transform: scale(1.1);
+        box-shadow: 0 0 10px rgba(5, 150, 105, 0.4);
+    }
+    100% {
+        background: var(--primary-color);
+        transform: scale(1);
+    }
+}
+
+.data-count-unit {
+    color: var(--text-muted);
+    font-size: 10px;
+    flex-shrink: 0;
+}
+
+.distribution-chart-container {
+    flex: 1;
+    position: relative;
+    padding: 12px 16px;
+    overflow: auto;
+}
+
+.distribution-canvas-container {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: white;
+    overflow: auto;
+    box-shadow: var(--shadow-sm);
+    min-height: 450px; /* Increased height for legend */
+}
+
+#distributionCanvas {
+    border: none;
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: pointer; /* マウスオーバー対応のためのカーソル */
+}
+
+/* 作業配分表項目名切替ボタン — スタイルは .dist-label-toggle に移行 */
+#distributionLabelToggle {
+    transition: all 0.2s ease;
+}
+
+/* ========================================
+   Data Selection Section
+======================================== */
+.data-selection-list {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-bottom: var(--compact-spacing);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    background: var(--background-white);
+}
+
+.data-selection-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.data-selection-item:last-child {
+    border-bottom: none;
+}
+
+.data-selection-item:hover {
+    background: var(--background-subtle);
+}
+
+.data-selection-item.selected {
+    background: rgba(37, 99, 235, 0.08);
+    border-left: 3px solid var(--primary-color);
+}
+
+.data-selection-checkbox {
+    margin-right: 6px;
+}
+
+.data-selection-name {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.data-selection-info {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.data-selection-actions {
+    display: flex;
+    gap: 3px;
+}
+
+.btn-small {
+    padding: 3px 6px;
+    font-size: 12px;
+    min-height: auto;
+}
+
+/* ========================================
+   Basic Settings Area - Business Cards
+======================================== */
+.basic-settings-area {
+    background: var(--background-white);
+    border-bottom: 1px solid var(--border-light);
+    padding: 12px 16px;
+}
+
+/* ========================================
+   2ゾーン分割レイアウト
+   左: 入力グループ（ユーザー編集） | 右: KPIグループ（システム算出）
+   5fr : 3fr 比率で入力カードに十分な幅を確保しつつ、
+   KPIカードにはオーバーフローしない作業領域を保証する
+======================================== */
+.settings-grid {
+    display: grid;
+    grid-template-columns: 5fr 3fr;
+    gap: 8px;
+    align-items: stretch;
+}
+
+/* 入力グループ: 5カード等幅 */
+.settings-input-group {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    align-items: stretch;
+}
+
+/* KPIグループ: まとめカード追加で3カード等幅（課題4）
+   border-left でゾーン境界を視覚化（Gestalt 近接 + 差異化）
+   padding-left でボーダーとカードの間隔を確保 */
+.settings-kpi-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-items: stretch;
+    padding-left: 10px;
+    position: relative;
+}
+
+/* KPIゾーンの左端セパレーター（グラデーション装飾） */
+.settings-kpi-group::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10%;
+    bottom: 10%;
+    width: 2px;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--border-color) 20%,
+        var(--border-color) 80%,
+        transparent 100%
+    );
+}
+
+.setting-card {
+    background: var(--background-white);
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+    min-width: 0; /* グリッド列内での圧縮を許可 */
+}
+
+.setting-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--shadow-md);
+}
+
+.setting-card:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.setting-icon {
+    width: 28px;
+    height: 28px;
+    /* デザイン変更: 薄い背景 + 濃いアイコン色 + 薄い枠線 */
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    border-radius: 6px; /* 角丸を少し大きくして柔らかく */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.setting-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ========================================
+   Basic Settings Cards - Enhanced Text Size & Alignment
+======================================== */
+
+.setting-label {
+    display: block;
+    font-size: 11px; /* 10px -> 11px 左メニューに近づける */
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.setting-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 12px; /* 13px -> 12px 左メニューに合わせる */
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 1px 0;
+    outline: none;
+    transition: all 0.2s ease;
+    min-width: 0;
+}
+
+/* 文字列データ（製品名、作業者名）- 左詰め */
+#productName,
+#operatorName {
+    text-align: left;
+    font-size: 12px;
+}
+
+/* 数値データ（稼働時間、必要数）- 中央寄せ */
+#operatingTime,
+#requiredQuantity {
+    text-align: center;
+    font-size: 13px; /* 14px -> 13px バランス調整 */
+    font-weight: 700;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.setting-input:focus {
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.setting-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+/* タクトタイムカード - 赤系 */
+.takt-time-card {
+    border-color: var(--accent-color);
+    background: rgba(220, 38, 38, 0.02); /* 薄く */
+}
+
+.takt-time-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+}
+
+.takt-icon {
+    /* さわやかな配色に変更 */
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--accent-color);
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+.takt-time-value {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* タクトタイム表示値 */
+.takt-time-value span {
+    font-size: 17px; /* 14px → 17px: 課題5 可読性向上 */
+    font-weight: 700;
+    color: var(--accent-color);
+    letter-spacing: -0.025em;
+    text-align: center;
+    display: block;
+    font-family: 'Consolas', 'Monaco', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* 数式説明文のサイズ調整 */
+.takt-formula {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.3;
+    text-align: center;
+    margin-top: 1px;
+}
+
+.schedule-formula {
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.3;
+    text-align: center;
+    margin-top: 1px;
+}
+
+/* ========================================
+   まとめづくり KPIカード（課題4: 左パネルから移動）
+   アンバー系配色で「設定値」として視覚的に区別
+======================================== */
+.batch-kpi-card {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.03);
+}
+
+.batch-kpi-card:hover {
+    border-color: #d97706;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.12);
+}
+
+.batch-kpi-icon {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* ========================================
+   WIP不一致アラートバッジ（課題6）
+   プリアテンティブ特性: アンバー色 + パルス動作で即時視認
+======================================== */
+.wip-mismatch-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background: #f59e0b;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 9px;
+    margin-left: 5px;
+    vertical-align: middle;
+    cursor: help;
+    animation: wipPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes wipPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.7; transform: scale(1.15); }
+}
+
+/* ========================================
+   Total Work Time Card
+======================================== */
+.total-work-time-card {
+    border-color: var(--success-color);
+    background: rgba(5, 150, 105, 0.02); /* 薄く */
+}
+
+.total-work-time-card:hover {
+    border-color: var(--success-color);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+}
+
+.total-work-icon {
+    /* さわやかな配色に変更 */
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--success-color);
+    border-color: rgba(5, 150, 105, 0.2);
+}
+
+.total-work-time-value {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+/* サイクルタイム表示値 - サイズアップ・中央寄せ */
+.total-work-time-value span {
+    font-size: 14px; /* 18px -> 14px */
+    font-weight: 700;
+    color: var(--success-color);
+    letter-spacing: -0.025em;
+    text-align: center;
+    display: block;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* ========================================
+   Chart Container
+======================================== */
+.chart-container {
+    flex: none;
+    position: relative;
+    padding: 6px 16px;
+    overflow: auto;
+}
+
+.canvas-container {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: white;
+    overflow: auto;
+    box-shadow: var(--shadow-sm);
+}
+
+.canvas-container.drag-active {
+    border-color: var(--drag-color);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+#ganttCanvas {
+    border: none;
+    cursor: pointer;
+    display: block;
+}
+
+/* 分類選択グリッドレイアウト */
+.classification-grid {
+    margin-bottom: 16px;
+}
+
+.classification-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;  /* 2列 → 3列に変更 */
+    gap: 10px;  /* 12px → 10px に調整 */
+    margin-bottom: 8px;
+}
+
+/* コンパクトなセレクトボックス */
+.compact-select {
+    min-width: auto;
+    max-width: 180px;  /* 幅を制限 */
+}
+
+/* 空白調整用 */
+.input-group-spacer {
+    grid-column: 2;
+}
+
+/* ========================================
+   Control Panel (左側コントロールパネル) - Business Clean
+======================================== */
+.control-panel {
+    background-color: var(--background-white);
+    padding: 12px 10px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color);
+}
+
+.panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ========================================
+   Form Styles - Business Professional
+======================================== */
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 12px;  
+    color: var(--text-primary);
+    text-transform: none;  
+    letter-spacing: 0.025em;
+    line-height: 1.4;
+}
+
+.input-field {
+    width: 100%;
+    padding: 8px 10px;  /* 6px → 8px */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 13px;  /* 12px → 13px */
+    transition: all 0.2s ease;
+    background-color: var(--background-white);
+    line-height: 1.4;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    background-color: var(--background-white);
+}
+
+.input-field:disabled {
+    background-color: var(--background-light);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ========================================
+   Tab Navigation - Business Style
+======================================== */
+.tab-navigation {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    margin: 12px 0;
+    gap: 2px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px 16px;  /* 8px 12px → 10px 16px */
+    border: none;
+    background: var(--background-light);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 12px;  /* 11px → 12px */
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;  /* 5px → 6px */
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;  /* 5px → 6px */
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    line-height: 1.3;
+}
+
+.tab-button:hover {
+    background: var(--background-subtle);
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--primary-color);
+}
+
+.tab-button i {
+    font-size: 12px;
+}
+
+/* ========================================
+   Tab Content
+======================================== */
+.tab-content {
+    display: none;
+    animation: tabFadeIn 0.3s ease-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes tabFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   Display Mode Section - Current/Improved Colors
+======================================== */
+.display-mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 3px;
+}
+
+.mode-button {
+    padding: 6px 5px;
+    border: 1px solid var(--border-light);
+    background: var(--background-white);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    text-align: center;
+}
+
+.mode-button:hover {
+    background: var(--background-subtle);
+    color: var(--text-primary);
+    border-color: var(--border-strong);
+}
+
+/* Current Mode - Black Colors */
+.mode-button.active#currentModeBtn {
+    background: var(--current-color);
+    color: white;
+    border-color: var(--current-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Improved Mode - Red Colors */
+.mode-button.active#improvedModeBtn {
+    background: var(--improved-color);
+    color: white;
+    border-color: var(--improved-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Both Mode - Blue Colors */
+.mode-button.active#bothModeBtn {
+    background: var(--both-mode-color);
+    color: white;
+    border-color: var(--both-mode-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.mode-button i {
+    font-size: 12px;
+}
+
+/* Both Mode - Blue Colors */
+.mode-button.active#bothModeBtn {
+    background: var(--both-mode-color);
+    color: white;
+    border-color: var(--both-mode-color);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Frequency Chart Mode Buttons - Purple Colors */
+.mode-button.active#freqActualTimeBtn {
+    background: #2f3dd3;
+    color: white;
+    border-color: #2f3dd3;
+    box-shadow: var(--shadow-sm);
+}
+
+.mode-button.active#freqConvertedTimeBtn {
+    background: #2f3dd3;
+    color: white;
+    border-color: #2f3dd3;
+    box-shadow: var(--shadow-sm);
+}
+
+.mode-button i {
+    font-size: 12px;
+}
+
+/* ========================================
+   Data Management Section
+======================================== */
+
+.data-management-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.data-management-buttons .btn {
+    padding: 5px 8px;
+    font-size: 12px;
+    text-align: center;
+}
+
+.btn-import-csv {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-import-csv:hover {
+    background: #047857;
+}
+
+/* ========================================
+   Improvement Effects - Red Theme
+======================================== */
+
+
+@keyframes effectsSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 統合サイクルタイムカード
+   新2ゾーンレイアウトでは align-items:stretch により
+   タクトタイムカードと同じ高さに自動揃えされるため min-height は不要 */
+.cycle-time-integrated-card {
+    border-color: var(--success-color);
+    background: rgba(5, 150, 105, 0.02);
+}
+
+.cycle-time-integrated-card:hover {
+    border-color: var(--success-color);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+}
+
+/* サイクルタイム表示エリア: 縦積みレイアウト */
+.cycle-time-display {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: stretch;
+}
+
+/* 改善効果の1行表示 */
+.improvement-summary-inline {
+    flex-shrink: 1;
+}
+
+.improvement-compact {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.improvement-compact .improvement-value {
+    font-weight: 700;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.improvement-compact .improvement-value.positive {
+    color: var(--success-color);
+}
+
+.improvement-compact .improvement-value.negative {
+    color: var(--accent-color);
+}
+
+.main-cycle-time {
+    font-size: 17px; /* 14px → 17px: 課題5 可読性向上 */
+    font-weight: 700;
+    color: var(--success-color);
+    letter-spacing: -0.025em;
+    font-family: 'Consolas', 'Monaco', monospace;
+    flex-shrink: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.cycle-time-mode {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-align: center;
+    padding: 2px 8px;
+    background: rgba(5, 150, 105, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    flex-shrink: 0;
+}
+
+/* ========================================
+   行①: プライマリ行レイアウト
+======================================== */
+/* ct-primary-row: 通常幅では1行に収まるが、
+   万一コンテンツが溢れる場合は wrap で折り返す安全策 */
+.ct-primary-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    row-gap: 3px;
+}
+
+/* ========================================
+   まとめづくり換算バッジ（インライン・コンパクト）
+   設計：実C/Tの直後にピルバッジとして配置。
+   主値より視覚的に軽くして認知階層を明示。
+   段階的開示：まとめOFF → display:none
+======================================== */
+.batch-inline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 6px 1px 5px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.07));
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.batch-badge-label {
+    font-size: 8px;
+    font-weight: 700;
+    color: #b45309;
+    letter-spacing: 0.03em;
+}
+
+.batch-badge-time {
+    font-size: 11px;
+    font-weight: 700;
+    color: #b45309;
+    font-family: 'Consolas', 'Monaco', monospace;
+    letter-spacing: -0.02em;
+}
+
+.batch-badge-note {
+    font-size: 8px;
+    color: #92400e;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+/* ========================================
+   行②: 頻度作業込みC/T 行
+   設計原則：
+   - デフォルト: グリーン系（T/T内に収まっている状態）
+   - T/T超過: レッド + ⚠アイコン（状態変化で即時認識）
+   - 段階的開示: 頻度作業0件 → display:none
+   - .freq-over-takt クラスで警告状態を制御
+======================================== */
+.freq-included-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 7px;
+    background: rgba(5, 150, 105, 0.06);
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    border-radius: 6px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.freq-row-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+}
+
+.freq-included-time {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--success-color);
+    font-family: 'Consolas', 'Monaco', monospace;
+    letter-spacing: -0.025em;
+    transition: color 0.25s ease;
+}
+
+.freq-included-delta {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-muted);
+    font-family: 'Consolas', 'Monaco', monospace;
+    opacity: 0.8;
+}
+
+.freq-over-icon {
+    font-size: 10px;
+    color: #dc2626;
+    margin-left: auto;
+    animation: freqOverPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes freqOverPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.6; transform: scale(1.15); }
+}
+
+/* T/T超過時の警告スタイル */
+.freq-included-row.freq-over-takt {
+    background: rgba(220, 38, 38, 0.07);
+    border-color: rgba(220, 38, 38, 0.35);
+}
+
+.freq-included-row.freq-over-takt .freq-included-time {
+    color: #dc2626;
+}
+
+.freq-included-row.freq-over-takt .freq-row-label {
+    color: #dc2626;
+    opacity: 0.8;
+}
+
+/* カード全体へのT/T超過フィードバック（subtle border glow） */
+.cycle-card-freq-over {
+    border-color: rgba(220, 38, 38, 0.4) !important;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.08) !important;
+}
+
+.improvement-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    flex: 1;
+}
+
+.improvement-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.improvement-value {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.improvement-value.positive {
+    color: var(--success-color);
+}
+
+.improvement-value.negative {
+    color: var(--accent-color);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    /* min-height は削除済みにつき設定不要 */
+    
+    .improvement-summary {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .improvement-item {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .main-cycle-time {
+        font-size: 15px; /* 調整 */
+    }
+}
+
+.effect-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.effect-value.negative {
+    color: var(--improved-color);
+}
+
+.effect-value.positive {
+    color: var(--success-color);
+}
+
+/* ========================================
+   Enhanced Time Input Section
+======================================== */
+.time-input-section {
+    margin-top: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.time-input-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--background-white);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 8px;
+}
+
+.time-input-table thead th {
+    background: var(--background-light);
+    padding: 10px 6px;  /* 8px → 10px */
+    font-size: 12px;  /* 10px → 11px */
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.time-input-table thead th:first-child {
+    text-align: left;
+    padding-left: 12px;  /* 10px → 12px */
+    width: 90px;  /* 85px → 90px */
+}
+
+.time-input-table tbody td {
+    padding: 10px 6px;
+    border-bottom: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.time-input-table tbody td:first-child {
+    text-align: left;
+    padding-left: 12px;  /* 10px → 12px */
+    font-weight: 600;
+    font-size: 12px;  /* 11px → 12px */
+    color: var(--text-primary);
+    background: var(--background-subtle);
+    line-height: 1.4;
+}
+
+.time-input-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.time-input-table tbody tr.disabled td {
+    opacity: 0.5;
+}
+
+.time-input-table tbody tr.disabled input {
+    cursor: not-allowed;
+}
+
+.time-component {
+    width: 70px; 
+    padding: 5px 4px;  /* パディングを少し増やして余裕を持たせる */
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    text-align: right;  /* center → right に変更（右詰） */
+    font-weight: 600;
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: var(--background-white);
+    transition: all 0.2s ease;
+    font-size: 15px;  /* 12px → 14px に拡大（読みやすさ向上） */
+    line-height: 1.2;
+}
+
+.time-component:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    background: #fefefe;
+}
+
+.time-component:disabled {
+    background-color: var(--background-light);
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.time-separator {
+    font-weight: bold;
+    color: var(--text-muted);
+    margin: 0 2px;  /* 0 1px → 0 2px */
+    font-size: 12px;  /* 11px → 12px */
+}
+
+tr.has-slider-focus {
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.time-component.slider-focused {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}
+
+.time-input-help {
+    font-size: 12px;  /* 10px → 11px */
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 6px;
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* Improved Tab Colors - Red Theme */
+#improvedContent .time-input-table {
+    border: 1px solid var(--improved-color);
+}
+
+#improvedContent .time-input-table thead th {
+    background: rgba(220, 38, 38, 0.08);
+    color: var(--improved-color);
+}
+
+#improvedContent .time-input-table tbody td:first-child {
+    background: rgba(220, 38, 38, 0.05);
+    color: var(--improved-color);
+    font-weight: 700;
+}
+
+/* ========================================
+   Unified Slider Section
+======================================== */
+.unified-slider-section {
+    background: var(--background-light);
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: var(--compact-spacing);
+    box-shadow: var(--shadow-sm);
+}
+
+.slider-section-label {
+    display: block;
+    font-size: 12px;  /* 11px → 12px */
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--compact-spacing);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    text-align: center;
+    line-height: 1.4;
+}
+
+.slider-container {
+    background: var(--background-white);
+    border-radius: 4px;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+.slider-container:focus-within {
+    background: rgba(37, 99, 235, 0.03);
+    box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.1);
+}
+
+.unified-time-slider {
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--border-light);
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    margin-bottom: var(--compact-spacing);
+    transition: all 0.2s ease;
+}
+
+.unified-time-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    transition: all 0.2s ease;
+}
+
+.unified-time-slider::-webkit-slider-thumb:hover {
+    background: #1d4ed8;
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.4);
+}
+
+.unified-time-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;  /* 10px → 11px */
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.slider-help {
+    font-size: 12px;  /* 10px → 11px */
+    color: var(--text-muted);
+    text-align: center;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+#sliderMaxDisplay {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* ========================================
+   Button Styles - Business Professional
+======================================== */
+.btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 3px;
+    width: 100%;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+/* ========================================
+   Interactive Elements
+======================================== */
+.add-work-btn {
+    position: absolute;
+    background: var(--success-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.add-work-btn:hover {
+    background: #047857;
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.4);
+}
+
+.insert-icon {
+    position: absolute;
+    background: var(--warning-color);
+    color: #92400e;
+    border: 1px solid #d97706;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all 0.2s ease;
+    z-index: 15;
+}
+
+.insert-icon:hover {
+    background: #f59e0b;
+    transform: scale(1.1);
+}
+
+.insert-zone-highlight {
+    position: absolute;
+    width: 240px;
+    height: 2px;
+    background: var(--warning-color);
+    border-radius: 1px;
+    box-shadow: 0 0 6px rgba(217, 119, 6, 0.6);
+    z-index: 5;
+    animation: insertZonePulse 1.5s infinite ease-in-out;
+}
+
+@keyframes insertZonePulse {
+    0%, 100% { 
+        opacity: 0.8;
+        transform: scaleX(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scaleX(1.05);
+    }
+}
+
+/* ========================================
+   Legend Styles - Business Clean (Updated - Removed Connection Line & Added Wait Arrows)
+======================================== */
+
+.legend-items {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.legend-line {
+    width: 22px;
+    height: 4px;
+    margin-right: 6px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* Current/Improved Legend Colors - Unified */
+.legend-manual {
+    background: var(--current-color); /* 改善前：黒系 */
+}
+
+.legend-manual.improved {
+    background: var(--improved-color); /* 改善後：赤系 */
+}
+
+.legend-auto {
+    background: transparent;
+    border: none;
+    position: relative;
+    height: 4px;
+}
+
+.legend-auto::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--secondary-color) 0px,
+        var(--secondary-color) 3px,
+        transparent 3px,
+        transparent 6px
+    );
+    transform: translateY(-50%);
+}
+
+.legend-walk {
+    background: transparent;
+    border: none;
+    position: relative;
+    height: 4px;
+    overflow: hidden;
+}
+
+.legend-walk::after {
+    content: '〜〜〜';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    color: var(--current-color); 
+    font-size: 8px;
+    font-weight: bold;
+    transform: translateY(-50%);
+    text-align: center;
+    line-height: 4px;
+    letter-spacing: -1px;
+}
+
+.legend-monitor {
+    background: transparent;
+    border: none;
+    position: relative;
+    height: 4px;
+}
+
+/* 監視作業：上が点線、下が実線 */
+.legend-monitor::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--monitor-current-color) 0px,
+        var(--monitor-current-color) 3px,
+        transparent 3px,
+        transparent 6px
+    ); /* 点線 */
+}
+
+.legend-monitor::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--monitor-current-color); /* 実線 */
+}
+
+/* 既存の凡例項目の後に追加 */
+.legend-hold {
+    background: transparent;
+    border: none;
+    position: relative;
+    height: 4px;
+}
+
+/* 保持作業：上が実線、下が点線 */
+.legend-hold::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: var(--current-color); /* 実線 */
+}
+
+.legend-hold::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--current-color) 0px,
+        var(--current-color) 3px,
+        transparent 3px,
+        transparent 6px
+    ); /* 点線 */
+}
+
+/* ========================================
+   Modal Styles - Business Professional
+======================================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 3% auto;
+    padding: 24px;
+    border-radius: 8px;
+    width: 520px; 
+    max-width: 90%;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid var(--border-color);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-wide {
+    width: 680px;
+    max-width: 95%;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-16px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px; /* タイトルとボタン群の間の最小限の隙間 */
+}
+
+.modal-title {
+    flex-grow: 1; /* 利用可能なスペースを最大限使用する */
+    white-space: nowrap; /* タイトルを改行させない */
+    overflow: hidden; /* はみ出した部分を隠す */
+    text-overflow: ellipsis; /* はみ出した部分を「...」で省略 */
+    min-width: 0; /* flexコンテナ内で正しく縮小させるための重要設定 */
+}
+
+.close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 3px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close:hover {
+    background-color: var(--background-light);
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;  /* 6px → 8px */
+    margin-top: 20px;  /* 16px → 20px */
+    padding-top: 16px;  /* 12px → 16px */
+    border-top: 1px solid var(--border-light);
+}
+
+/* ボタンの改善 */
+.modal-footer .btn {
+    padding: 8px 16px;  /* サイズアップ */
+    font-size: 12px;  /* 10px → 12px */
+    font-weight: 600;
+    min-width: 80px;
+    line-height: 1.3;
+}
+
+/* ========================================
+   CSV Import Modal (Final Polished Redesign)
+======================================== */
+:root {
+    --csv-modal-bg: #ffffff;
+    --csv-modal-border: #e2e8f0;
+    
+    --accordion-header-bg: #f8fafc;
+    --accordion-header-bg-hover: #f1f5f9;
+    --accordion-header-bg-open: #eef2ff;
+    
+    --accordion-header-text: #475569;
+    --accordion-header-text-open: #3730a3;
+    
+    --accordion-border: #e2e8f0;
+    --accordion-border-open: #c7d2fe;
+    
+    --accordion-icon-color: #94a3b8;
+    --accordion-icon-color-open: #4f46e5;
+
+    --accordion-content-bg: #ffffff;
+}
+
+.csv-import-modal {
+    width: 800px;
+    max-width: 95%;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    background-color: var(--csv-modal-bg);
+}
+
+/* ボタン群が縮まないように設定 */
+.modal-header-actions {
+    flex-shrink: 0;
+}
+
+.modal-header-actions .btn-primary {
+    font-size: 14px; /* 既存のサイズから大きく */
+    font-weight: 600; /* 太字で強調 */
+    padding: 10px 20px; /* パディングも少し大きくしてバランスを取る */
+}
+
+/* --- アコーディオンコンテナ --- */
+.csv-info-content.accordion-container {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding: 16px 20px;
+    background-color: #f8fafc; /* 背景を少しグレーに */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--csv-modal-border);
+    background-color: var(--csv-modal-bg);
+    margin-top: 0;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: flex-end; /* ボタンを右寄せに */
+}
+
+/* --- アコーディオンアイテム --- */
+.accordion-item {
+    border: 1px solid var(--accordion-border);
+    border-radius: 8px; /* 角丸を少し大きく */
+    background-color: var(--csv-modal-bg);
+    transition: all 0.2s ease-out;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.accordion-item[open] {
+    border-color: var(--accordion-border-open);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+}
+
+.accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* アイコンとテキストの間隔を調整 */
+    padding: 14px 18px;
+    cursor: pointer;
+    list-style: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accordion-header-text);
+    user-select: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    border-radius: 7px 7px 0 0; /* 開いたときに備えて上部のみ角丸 */
+}
+
+.accordion-header::-webkit-details-marker {
+    display: none;
+}
+.accordion-header:hover {
+    background-color: var(--accordion-header-bg-hover);
+}
+
+.accordion-item[open] > .accordion-header {
+    color: var(--accordion-header-text-open);
+    background-color: var(--accordion-header-bg-open);
+    font-weight: 600;
+}
+
+.accordion-icon {
+    font-size: 16px;
+    color: var(--accordion-icon-color);
+    width: 20px;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.accordion-item[open] .accordion-icon {
+    color: var(--accordion-icon-color-open);
+}
+.accordion-icon.warning {
+    color: var(--warning-color);
+}
+
+.accordion-header span {
+    flex-grow: 1;
+}
+.accordion-header strong {
+    color: #000;
+}
+.accordion-item[open] .accordion-header strong {
+    color: var(--accordion-header-text-open);
+}
+
+.accordion-toggle {
+    transition: transform 0.2s ease-out;
+    color: var(--text-muted);
+}
+.accordion-item[open] .accordion-toggle {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    padding: 4px 18px 18px 18px;
+    border-top: 1px solid var(--accordion-border);
+    animation: fadeIn 0.3s ease-out;
+    background-color: var(--accordion-content-bg);
+    border-radius: 0 0 7px 7px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- アコーディオン内のコンテンツスタイル --- */
+.accordion-content h4 {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+.accordion-content p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 8px 0;
+}
+
+/* ★★★ リストマーカーのはみ出し修正 ★★★ */
+.accordion-content ul {
+    list-style: none;
+    padding-left: 0; /* パディングをリセット */
+    margin: 12px 0 16px 0;
+}
+.accordion-content ul li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+.accordion-content ul li .fa-dot-circle {
+    font-size: 10px;
+    color: var(--primary-color);
+    margin-top: 5px; /* テキストと垂直位置を合わせる */
+    flex-shrink: 0;
+}
+.accordion-content ul li code {
+    background-color: #eef2ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #4338ca;
+    font-size: 12px;
+}
+
+.csv-format-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 12px 0;
+    font-size: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.csv-format-table th,
+.csv-format-table td {
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 12px;
+    text-align: left;
+}
+.csv-format-table thead th {
+    background-color: var(--background-subtle);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+.csv-format-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.csv-format-table td {
+    color: var(--text-secondary);
+}
+.csv-format-table td:nth-child(1), 
+.csv-format-table td:nth-child(4) {
+    text-align: center;
+    font-weight: 500;
+}
+.csv-format-table .success {
+    color: var(--success-color);
+    font-size: 14px;
+}
+
+.csv-sample-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 12px 0;
+}
+.csv-sample-buttons .btn {
+    width: auto;
+}
+
+.csv-example {
+    background-color: var(--background-subtle);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 16px;
+    margin-top: 12px;
+}
+.csv-example strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.csv-example pre {
+    background-color: var(--background-dark); /* 黒系の背景 */
+    color: #f1f5f9; /* コントラスト比の高い白系の文字色 */
+    border: 1px solid #334155; /* ボーダーも少し調整 */
+}
+
+/* ========================================
+   ツールチップ
+======================================== */
+.tooltip {
+    position: absolute;
+    background: rgba(71, 85, 105, 0.65); /* 半透過グレー */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    pointer-events: none;
+    z-index: 2000;
+    display: none;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    line-height: 1.4;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+/* 項目追加時のオレンジ系ツールチップ */
+.tooltip.insert-tooltip {
+    background: rgba(249, 115, 22, 0.75); /* 半透過オレンジ */
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.tooltip.insert-tooltip::before {
+    content: '+ ';
+    font-weight: 700;
+    color: #fef3c7;
+}
+
+/* ツールチップのフェードイン・アウトアニメーション */
+.tooltip {
+    animation: tooltipFadeIn 0.2s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ツールチップ内のHTMLタグのスタイリング */
+.tooltip strong {
+    font-weight: 700;
+    color: #fefefe;
+}
+
+.tooltip br {
+    line-height: 1.6;
+}
+
+.tooltip em {
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 10px;
+}
+
+/* ========================================
+   Context Menu (Right Click Menu)
+======================================== */
+.context-menu {
+    position: absolute;
+    background: var(--background-white, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    padding: 6px 0;
+    min-width: 200px;
+    z-index: 9999;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary, #0f172a);
+    animation: contextMenuFadeIn 0.15s ease-out;
+    transform-origin: top left;
+}
+
+@keyframes contextMenuFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+}
+
+.context-menu-item i {
+    width: 16px;
+    text-align: center;
+    color: var(--text-muted, #64748b);
+    font-size: 13px;
+}
+
+.context-menu-item:hover {
+    background: var(--background-subtle, #f1f5f9);
+    color: var(--primary-color, #2563eb);
+}
+
+.context-menu-item:hover i {
+    color: var(--primary-color, #2563eb);
+}
+
+.context-menu-item.danger:hover {
+    background: #fef2f2;
+    color: var(--accent-color, #dc2626);
+}
+
+.context-menu-item.danger:hover i {
+    color: var(--accent-color, #dc2626);
+}
+
+.context-menu-separator {
+    height: 1px;
+    background: var(--border-light, #e5e7eb);
+    margin: 4px 0;
+}
+
+/* ========================================
+   Drag Feedback Enhanced
+======================================== */
+.drag-feedback {
+    position: absolute;
+    background: rgba(139, 92, 246, 0.95);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 1500;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    transform: rotate(-2deg);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   Utility Classes
+======================================== */
+.help-section {
+    margin-top: 10px;
+    padding: var(--compact-spacing);
+    background: var(--background-light);
+    border-radius: 4px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+}
+
+.help-title {
+    font-weight: 700;
+    margin-bottom: 3px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* ========================================
+   Scrollbar Styling - Business Clean
+======================================== */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ========================================
+   Focus & Accessibility
+======================================== */
+.input-field:focus,
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.input-group label input[type="checkbox"] {
+    margin-right: 5px;
+    transform: scale(1.1);
+}
+
+.input-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 3px 0;
+}
+
+/* ========================================
+   Drop Zone Styles
+======================================== */
+.drop-zone-highlight {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--success-color);
+    border-radius: 1px;
+    box-shadow: 0 0 6px rgba(5, 150, 105, 0.6);
+    z-index: 20;
+    animation: dropZonePulse 1s infinite ease-in-out;
+}
+
+@keyframes dropZonePulse {
+    0%, 100% { 
+        opacity: 0.8;
+        transform: scaleY(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scaleY(1.5);
+    }
+}
+
+/* ========================================
+   Schedule Chart Legend Colors (New)
+======================================== */
+.schedule-legend-break {
+    background: var(--schedule-break-color);
+}
+
+.schedule-legend-meeting {
+    background: var(--schedule-meeting-color);
+}
+
+.schedule-legend-inspection {
+    background: var(--schedule-inspection-color);
+}
+
+.schedule-legend-cleaning {
+    background: var(--schedule-cleaning-color);
+}
+
+.schedule-legend-other {
+    background: var(--schedule-other-color);
+}
+
+.schedule-legend-work {
+    background: var(--schedule-work-color);
+}
+
+/* ========================================
+   Responsive Adjustments - Business Mobile
+======================================== */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: var(--compact-spacing);
+        align-items: stretch;
+    }
+
+    .main-tab-navigation {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .main-tab-button {
+        min-width: 120px;
+        flex: 1;
+    }
+
+    .data-list-section {
+        justify-content: center;
+    }
+
+    .settings-grid,
+    .schedule-settings-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .settings-input-group {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .settings-kpi-group {
+        grid-template-columns: 1fr 1fr 1fr;
+        border-left: none;
+        padding-left: 0;
+        border-top: 2px solid var(--border-light);
+        padding-top: 8px;
+    }
+
+    .settings-kpi-group::before {
+        /* 縦並び時はセパレーターを非表示 */
+        display: none;
+    }
+    
+    .setting-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+    }
+    
+    .takt-time-value span,
+    .total-work-time-value span,
+    .schedule-end-time-value span {
+        font-size: 12px;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 2% auto;
+        padding: 14px;
+    }
+
+    .control-panel {
+        height: auto;
+        max-height: 40vh;
+    }
+
+    /* Distribution chart mobile adjustments */
+    .distribution-canvas-container,
+    .schedule-canvas-container {
+        min-height: 350px;
+    }
+
+    /* モバイル用ツールチップ調整 */
+    .tooltip {
+        max-width: 200px;
+        font-size: 10px;
+        padding: 6px 10px;
+    }
+
+    /* Time slot grid mobile adjustments */
+    .time-slot-time-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   Enhanced Row Hover Effects (Yellow Theme)
+======================================== */
+.chart-row-highlight {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: var(--row-height);
+    background: rgba(251, 191, 36, 0.12); /* Unified yellow hover */
+    pointer-events: none;
+    transition: all 0.2s ease;
+    border-radius: 2px;
+    z-index: 5;
+}
+
+/* ========================================
+   Distribution Chart Category Colors (Enhanced)
+======================================== */
+.distribution-legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.distribution-legend-color {
+    width: 18px;
+    height: 12px;
+    margin-right: 8px;
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.distribution-legend-normal {
+    background: var(--category-normal-color);
+}
+
+.distribution-legend-monitor {
+    background: var(--category-monitor-color);
+}
+
+.distribution-legend-wait {
+    background: var(--category-wait-color);
+}
+
+/* ========================================
+   Performance & Animation Optimizations
+======================================== */
+.tooltip,
+.drag-feedback,
+.modal-content {
+    will-change: transform, opacity;
+}
+
+/* ツールチップとドラッグフィードバックのパフォーマンス最適化 */
+.tooltip.show {
+    animation: tooltipFadeIn 0.15s ease-out;
+}
+
+.tooltip.hide {
+    animation: tooltipFadeOut 0.15s ease-out;
+}
+
+@keyframes tooltipFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-4px) scale(0.95);
+    }
+}
+
+/* ========================================
+   Business Theme Color Variations (Dark Mode Ready)
+======================================== */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-light: #0f172a;
+        --background-white: #1e293b;
+        --background-subtle: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #475569;
+        --border-light: #64748b;
+    }
+
+    .tooltip {
+        background: rgba(30, 41, 59, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .tooltip.insert-tooltip {
+        background: rgba(234, 88, 12, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* ========================================
+   Frequency Work Section Styles (頻度作業セクション用スタイル)
+======================================== */
+
+.frequency-work-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: var(--compact-spacing);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    background: var(--background-white);
+}
+
+.frequency-work-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.frequency-work-item:last-child {
+    border-bottom: none;
+}
+
+.frequency-work-item:hover {
+    background: var(--background-subtle);
+}
+
+.frequency-work-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.frequency-work-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.frequency-work-details {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.frequency-work-time {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.frequency-work-frequency {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.frequency-work-time i,
+.frequency-work-frequency i {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.frequency-work-stats {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: var(--compact-spacing);
+    padding: 4px;
+    background: var(--background-white);
+    border-radius: 3px;
+    border: 1px solid var(--border-light);
+}
+
+.frequency-work-actions {
+    display: flex;
+    gap: 3px;
+}
+
+.frequency-count {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.frequency-total {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.frequency-average {
+    color: var(--text-muted);
+}
+
+.btn-sample {
+    background: #8b5cf6;
+    color: white;
+}
+
+.btn-sample:hover {
+    background: #7c3aed;
+}
+
+/* 工程確認チャート用スタイル */
+/* ========================================
+   チャート共有横スクロールラッパー
+   工程管理チャート・ガントチャート・頻度作業チャートを
+   同一スクロール領域で管理し、スケールの完全一致を保証
+======================================== */
+.charts-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    width: 100%;
+    /* カスタムスクロールバー */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong, #94a3b8) var(--background-light, #f1f5f9);
+}
+
+.charts-scroll-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.charts-scroll-wrapper::-webkit-scrollbar-track {
+    background: var(--background-light, #f1f5f9);
+    border-radius: 4px;
+}
+
+.charts-scroll-wrapper::-webkit-scrollbar-thumb {
+    background: var(--border-strong, #94a3b8);
+    border-radius: 4px;
+}
+
+.charts-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted, #64748b);
+}
+
+/* ラッパー内のchart-containerは個別スクロール不要 */
+.charts-scroll-wrapper > .chart-container {
+    overflow: visible;
+    /* padding は維持 */
+}
+
+/* ラッパー内のcanvas-containerはキャンバス幅に追従して枠線を描画 */
+.charts-scroll-wrapper .canvas-container {
+    overflow: visible;
+    /* キャンバスのstyle.widthに追従 */
+    width: fit-content;
+    min-width: 100%;
+}
+
+#processChartContainer {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    /* 課題1: 枠線・背景色を削除しメインチャートと視覚的に統一 */
+    background: transparent;
+    border: none;
+    overflow: visible;
+    width: fit-content;
+    min-width: 100%;
+}
+
+#processCanvasContainer {
+    position: relative;
+    background: white;
+}
+
+#processCanvas {
+    display: block;
+    /* max-width: 100% と height: auto を削除 → CSS縮小の原因だった */
+    cursor: default;
+}
+
+/* 工程確認チャート用ツールチップ */
+.tooltip.process-tooltip {
+    background: rgba(99, 102, 241, 0.95);
+    border-color: #6366f1;
+    color: white;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    #processChartContainer {
+        margin-top: 15px;
+        margin-bottom: 8px;
+    }
+}
+
+/* 作業配分表表示モード切り替えボタン */
+/* ========================================
+   作業配分表 ツールバー (dist-toolbar)
+   ─ 認知設計: 改善前=黒系, 改善後=赤系 の色体系を統一
+     独立トグルボタン + 併記時スライドスイッチ
+======================================== */
+
+.dist-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+/* ① 改善前 / 改善後 トグルグループ */
+.dist-mode-group {
+    display: flex;
+    gap: 0;
+    border-radius: 7px;
+    overflow: hidden;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+
+.dist-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: #f9fafb;
+    color: #6b7280;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    white-space: nowrap;
+    border-right: 1px solid #e5e7eb;
+    user-select: none;
+}
+.dist-toggle-btn:last-child { border-right: none; }
+.dist-toggle-btn i { font-size: 11px; }
+.dist-toggle-btn:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* 改善前 アクティブ: 黒系 (--current-color ベース) */
+.dist-toggle-current.active {
+    background: #1f2937;
+    color: #ffffff;
+    border-right-color: #111827;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+.dist-toggle-current.active:hover {
+    background: #374151;
+}
+
+/* 改善後 アクティブ: 赤系 (--improved-color ベース) */
+.dist-toggle-improved.active {
+    background: #dc2626;
+    color: #ffffff;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+.dist-toggle-improved.active:hover {
+    background: #ef4444;
+}
+
+/* ② 併記サブモード（JS制御で display:none / flex 切替） */
+.dist-combined-mode {
+    display: none;   /* デフォルト非表示、両方ONで JS が flex に変更 */
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 7px;
+    animation: dist-combined-fadein 0.2s ease;
+}
+@keyframes dist-combined-fadein {
+    from { opacity: 0; transform: translateX(-4px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.dist-combined-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #92400e;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.dist-combined-label i { font-size: 10px; }
+
+.dist-combined-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dist-combined-opt {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    white-space: nowrap;
+    transition: color 0.15s;
+}
+/* スイッチOFF時: 左(グループ)を強調 */
+.dist-combined-toggle:has(input:not(:checked)) #combinedOptGrouped { color: #d97706; }
+/* スイッチON時: 右(分離)を強調 */
+.dist-combined-toggle:has(input:checked) #combinedOptSeparated { color: #d97706; }
+
+/* 小型スイッチ (並記サブモード用) */
+.dist-mode-switch {
+    width: 36px;
+    height: 20px;
+}
+.dist-mode-switch .slider::before {
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+}
+.dist-mode-switch input:checked + .slider::before {
+    transform: translateX(16px);
+}
+.dist-mode-switch input:checked + .slider {
+    background-color: #d97706;
+}
+
+/* ③ 区切り線 */
+.dist-toolbar-sep {
+    width: 1px;
+    height: 28px;
+    background: #e5e7eb;
+    flex-shrink: 0;
+}
+
+/* ④ オプショングループ (バラつき + 項目名) */
+.dist-options-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dist-option-pair {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    overflow: hidden;
+    background: #f9fafb;
+}
+
+.dist-option-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #9ca3af;
+    padding: 0 6px;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+.dist-option-btns {
+    display: flex;
+}
+
+.dist-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: #6b7280;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    border-left: 1px solid #e5e7eb;
+}
+.dist-option-btn:first-child { border-left: none; }
+.dist-option-btn i { font-size: 10px; }
+.dist-option-btn:hover { background: #f3f4f6; color: #374151; }
+
+.dist-option-btn.active {
+    background: #2563eb;
+    color: #ffffff;
+}
+.dist-option-btn.active:hover {
+    background: #1d4ed8;
+}
+
+/* 項目名ボタン（単独） */
+.dist-label-toggle {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+    cursor: pointer;
+    background: #f9fafb;
+    color: #6b7280;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+.dist-label-toggle i { font-size: 10px; }
+.dist-label-toggle:hover { background: #f3f4f6; color: #374151; border-color: #9ca3af; }
+.dist-label-toggle.active {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+}
+
+/* ========================================
+   Responsive Adjustments
+======================================== */
+
+@media (max-width: 768px) {
+    .category-select-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+    
+    .category-select {
+        max-width: none;
+    }
+    
+    .category-legend-preview {
+        width: 100%;
+        height: 20px;
+        align-self: center;
+        max-width: 120px;
+    }
+    
+    .category-description {
+        text-align: center;
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 480px) {
+    .category-legend-preview {
+        height: 18px;
+        max-width: 100px;
+    }
+    
+    .category-legend-preview .legend-line {
+        width: 24px;
+    }
+}
+
+/* ボタンスタイル追加 */
+.btn-sample {
+    background-color: #059669;
+    color: white;
+}
+
+.btn-sample:hover {
+    background-color: #047857;
+}
+
+.btn-minimal {
+    background-color: #8b5cf6;
+    color: white;
+}
+
+.btn-minimal:hover {
+    background-color: #7c3aed;
+}
+
+.btn-export-csv {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btn-export-csv:hover {
+    background-color: #d97706;
+}
+
+.data-actions {
+    margin-bottom: 20px;
+}
+
+.data-actions h4 {
+    margin-bottom: 10px;
+    color: #1f2937;
+}
+
+.data-actions .btn {
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+/* ========================================
+   Enhanced Data Management UI Styles
+======================================== */
+
+/* データ管理セクション（改善版） */
+.data-management-section {
+    margin-bottom: 12px;
+    padding: 12px 10px;
+    background: var(--background-light);
+    border-radius: 5px;
+    border: 1px solid var(--border-light);
+}
+
+.data-management-title {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+    text-align: center;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ──────────────────────────────────────────────────────
+   カテゴリセクション（アコーディオン）
+   認知心理学的設計根拠：
+   ① 色の前注意的特徴（Preattentive Feature）
+      ・閉：グレー背景 + 薄いボーダー → 「静止」「格納済み」
+      ・開：青系背景 + 左アクセントバー → 「活性」「展開中」
+      二値の色差を最大化することで、リスト走査時に
+      個別の読み取りなしで状態を判別できる
+
+   ② 左端アクセントバー（Position + Color cue の組み合わせ）
+      ::before 擬似要素で幅3pxのバーを左端に配置。
+      閉時=透明、開時=primary-color で色が付くことで
+      「どのセクションが開いているか」がリスト全体を
+      一目でスキャンできる（Gestalt 近接の原理）
+
+   ③ シェブロン（∨/∧）の向きとカラー変化
+      開時に 180° 回転 + 色が primary-color になることで
+      「下に内容がある」方向性を明示（Affordance）
+
+   ④ danger-section は赤系を維持（意味的一貫性）
+      データ削除など危険操作のセクションは
+      青系に上書きせず警告色系統を保つ
+─────────────────────────────────────────────────────── */
+.data-category {
+    margin-bottom: 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--background-white);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* ::before アクセントバー用 */
+}
+
+.data-category:last-child {
+    margin-bottom: 0;
+}
+
+/* 左端アクセントバー */
+.data-category::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* 開いているセクション：バーを primary-color に */
+.data-category:has(> .category-header.active)::before {
+    background: var(--primary-color);
+}
+
+/* danger-section 開時：バーを赤系に */
+.data-category.danger-section:has(> .category-header.active)::before {
+    background: var(--accent-color);
+}
+
+.data-category:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* ── 閉じているヘッダー（デフォルト）── */
+.category-header {
+    background: var(--background-subtle);
+    border-bottom: 1px solid transparent; /* 閉時はボーダー非表示 */
+    padding: 8px 10px 8px 13px; /* 左にアクセントバー分の余白 */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+/* ホバー */
+.category-header:hover {
+    background: #e8edf3;
+    color: var(--text-primary);
+}
+
+/* ── 開いているヘッダー（active） ── */
+.category-header.active {
+    background: #dbeafe;            /* 青系背景 */
+    color: #1e40af;                 /* 青系テキスト */
+    border-bottom: 1px solid #bfdbfe;
+}
+
+.category-icon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+/* シェブロン：閉時=グレー / 開時=青・回転 */
+.category-toggle {
+    font-size: 10px;
+    transition: transform 0.22s ease, color 0.2s ease;
+    color: var(--text-muted);
+}
+
+.category-header.active .category-toggle {
+    transform: rotate(180deg);
+    color: #2563eb;
+}
+
+/* アコーディオン開閉フィードバック（transform不使用：ヒット領域ズレ防止）
+   scale変形を避け、背景フラッシュのみで操作感を提供する。
+   認知心理学：変化検出の原則 - 微細な輝度変化で「応答があった」と即時知覚させる */
+@keyframes accordion-ripple-anim {
+    0%   { background-color: inherit; }
+    30%  { background-color: rgba(99, 102, 241, 0.18); }
+    100% { background-color: inherit; }
+}
+.category-header.accordion-ripple {
+    animation: accordion-ripple-anim 0.28s ease-out forwards;
+}
+
+/* ── コンテンツエリア ── */
+.category-content {
+    background: var(--background-white);
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    transition: max-height 0.3s ease-out;
+}
+
+.category-content.active {
+    overflow: visible;
+}
+
+.category-content-wrapper {
+    padding: 12px 8px 16px 8px;
+}
+
+.variability-editor-info {
+    font-size: 11px;
+    color: #475569;
+    line-height: 1.4;
+}
+
+/* 使用頻度インジケーター */
+.frequency-indicator {
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    margin-right: 4px;
+    flex-shrink: 0;
+}
+
+.frequency-high {
+    background: var(--success-color);
+}
+
+.frequency-medium {
+    background: var(--warning-color);
+}
+
+.frequency-low {
+    background: var(--secondary-color);
+}
+
+/* 情報バッジ */
+.info-badge {
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-left: auto;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.danger-badge {
+    background: #fee2e2;
+    color: var(--accent-color);
+}
+
+/* ボタングリッドレイアウト */
+.data-action-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+.data-action-grid.two-column {
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+}
+
+/* ★★★★★ 修正箇所 ★★★★★ */
+/* 改善されたボタンスタイル */
+.btn {
+    padding: 6px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    text-decoration: none;
+    min-height: 32px;
+    white-space: nowrap;
+    line-height: 1.2;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* CSV関連ボタン（緑系） */
+.btn-csv {
+    background: var(--success-color);
+    color: white;
+}
+.btn-csv:hover {
+    background: #047857; /* 濃い緑 */
+}
+
+.btn-csv-light {
+    background: #10b981;
+    color: white;
+}
+.btn-csv-light:hover {
+    background: var(--success-color);
+}
+
+/* サンプル関連ボタン（紫系）*/
+.btn-sample {
+    background: #8b5cf6;
+    color: white;
+}
+.btn-sample:hover {
+    background: #7c3aed; /* 濃い紫 */
+}
+
+/* リセット操作ボタン（赤系） */
+.btn-danger {
+    background: var(--accent-color);
+    color: white;
+}
+.btn-danger:hover {
+    background: #b91c1c; /* 濃い赤 */
+}
+
+/* 基本データ操作ボタン */
+.btn-secondary {
+    background-color: var(--secondary-color);
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #475569; /* 濃いグレー */
+}
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #1d4ed8; /* 濃い青 */
+}
+
+/* ★★★★★ 修正箇所ここまで ★★★★★ */
+
+/* ボタン詳細説明 */
+.btn-description {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 2px;
+    line-height: 1.1;
+    font-weight: 400;
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+/* 危険操作セクション */
+.danger-section {
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+.danger-section .category-header {
+    background: #fef2f2;
+    color: var(--accent-color);
+}
+
+.danger-section .category-header:hover {
+    background: #fee2e2;
+}
+
+/* 開時：赤系を維持（青系上書きを防ぐ） */
+.danger-section .category-header.active {
+    background: #fee2e2;
+    color: #991b1b;
+    border-bottom-color: #fca5a5;
+}
+
+.danger-section .category-header.active .category-toggle {
+    color: #dc2626;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .category-header {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+    
+    .data-action-grid.two-column {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn {
+        min-height: 28px;
+        font-size: 9px;
+        padding: 4px 6px;
+    }
+    
+    .frequency-indicator {
+        width: 2px;
+        height: 12px;
+    }
+    
+    .info-badge {
+        font-size: 8px;
+        padding: 1px 4px;
+    }
+}
+
+/* アニメーション効果の強化 */
+.data-category:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ツールチップ用の改善（既存のツールチップと連携） */
+.btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    animation: tooltipFadeIn 0.2s ease forwards;
+}
+
+@keyframes tooltipFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+#frequencyWorkModal .tab-button#currentFrequencyTab.active {
+    background: var(--current-color);
+    color: white;
+}
+#frequencyWorkModal .tab-button#improvedFrequencyTab.active {
+    background: var(--improved-color);
+    color: white;
+}
+
+#frequencyWorkModal #improvedFrequencyContent .input-group label {
+    color: var(--improved-color);
+}
+#frequencyWorkModal #improvedFrequencyContent .input-field:focus {
+    border-color: var(--improved-color);
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+}
+
+/* ========================================
+   表示オプションのスタイル (新規追加)
+======================================== */
+.display-options-group {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3列レイアウト */
+    gap: 4px;
+    margin-top: 8px; /* 上のボタンとの間隔 */
+    padding-top: 8px;
+    border-top: 1px solid var(--border-light);
+}
+
+.display-option-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background-color: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none; /* テキスト選択を防ぐ */
+}
+
+.display-option-label:hover {
+    background-color: var(--background-subtle);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+/* チェックボックス本体は非表示にする */
+.display-option-label input[type="checkbox"] {
+    display: none;
+}
+
+/* チェックされたときのスタイル */
+.display-option-label input[type="checkbox"]:checked + i,
+.display-option-label input[type="checkbox"]:checked + i + span {
+    color: var(--primary-color); /* アイコンとテキストの色を変更 */
+    font-weight: 700;
+}
+
+.display-option-label input[type="checkbox"]:checked ~ span {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.display-option-label i {
+    font-size: 12px;
+    transition: color 0.2s ease;
+}
+
+.display-option-label span {
+    transition: color 0.2s ease;
+}
+
+/* フォーカス時のスタイル（アクセシビリティ向上） */
+.display-option-label input[type="checkbox"]:focus-visible + i {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+            .work-order-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 6px;
+            }
+            
+            .work-order-scope {
+                font-size: 10px;
+                padding: 2px 6px;
+                border-radius: 10px;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+            
+            .scope-common {
+                background: #e0f2fe;
+                color: #0369a1;
+                border: 1px solid #0ea5e9;
+            }
+            
+            .scope-current-only {
+                background: #f1f5f9;
+                color: #334155;
+                border: 1px solid #64748b;
+            }
+            
+            .scope-improved-only {
+                background: #fef2f2;
+                color: #dc2626;
+                border: 1px solid #f87171;
+            }
+            
+            .order-statistics {
+                margin-top: 16px;
+                padding: 12px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+            }
+            
+            .stats-header h4 {
+                margin: 0 0 8px 0;
+                font-size: 14px;
+                color: #1f2937;
+            }
+            
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 4px;
+                font-size: 12px;
+            }
+            
+            .stat-label {
+                color: #64748b;
+            }
+            
+            .stat-value {
+                font-weight: 600;
+                color: #1f2937;
+            }
+            
+            .stat-breakdown {
+                display: flex;
+                gap: 8px;
+                margin-top: 8px;
+                flex-wrap: wrap;
+            }
+            
+            .scope-stat {
+                font-size: 10px;
+                padding: 2px 6px;
+                border-radius: 8px;
+                font-weight: 500;
+            }
+
+            .work-order-item-current .work-order-handle {
+                background-color: #475569;
+            }
+            .work-order-item-current {
+                background-color: #f8fafc;
+            }
+            .work-order-item-current:hover {
+                background-color: #f1f5f9;
+            }
+            .work-order-item-current .work-order-name {
+                color: #1e293b;
+            }
+            .work-order-item-current .work-order-name i,
+            .work-order-item-current .work-order-details {
+                color: #475569;
+            }
+
+            .work-order-item-improved .work-order-handle {
+                background-color: #b91c1c;
+            }
+            .work-order-item-improved {
+                background-color: #fef2f2;
+            }
+            .work-order-item-improved:hover {
+                background-color: #fee2e2;
+            }
+            .work-order-item-improved .work-order-name {
+                color: #991b1b;
+            }
+            .work-order-item-improved .work-order-name i,
+            .work-order-item-improved .work-order-details {
+                color: #c0392b;
+            }
+/* ========================================
+   Error Bar & Variability Editor Styles
+======================================== */
+
+/* エラーバー表示切り替えボタン */
+/* エラーバーコントロール — スタイルは .dist-option-pair / .dist-option-btn に移行 */
+.error-bar-controls {
+    display: none; /* 旧要素は非表示 (HTMLから削除済み) */
+}
+
+/* エラーバーの色定義 */
+:root {
+    --error-bar-person-color: rgba(6, 109, 6, 0.912);
+    --error-bar-work-color: rgba(214, 36, 23, 0.977);
+}
+
+/* ========================================
+   Final Variability Display UI & Modal Styles
+======================================== */
+.variability-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* 項目間のギャップをなくす */
+}
+
+/* 表示UIの各データ項目 */
+.variability-item.display-only {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.variability-item.display-only:last-child {
+    border-bottom: none;
+}
+
+.variability-item.display-only:hover {
+    background-color: var(--background-subtle);
+}
+
+/* データ名 */
+.variability-item-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* バラつき表示行 */
+.variability-display-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.variability-display-label {
+    font-size: 10px;
+    font-weight: 500;
+    width: 45px; /* ラベル幅を固定 */
+    flex-shrink: 0;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.variability-display-value {
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Consolas', 'Monaco', monospace;
+    flex-grow: 1;
+}
+
+/* 色分け */
+.variability-display-label.current { color: var(--current-color); }
+.variability-display-value.current { color: var(--current-color); }
+.variability-display-label.improved { color: var(--improved-color); }
+.variability-display-value.improved { color: var(--improved-color); }
+
+/* バラつき編集モーダルのスタイル */
+#variabilityModal .modal-content {
+    width: 480px; /* モーダル幅を調整 */
+}
+
+.variability-modal-section {
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--background-subtle);
+}
+
+.variability-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin: -12px -12px 12px -12px; /* ヘッダー風のデザイン */
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.variability-section-title.current {
+    background-color: #f1f5f9;
+    color: var(--current-color);
+}
+
+.variability-section-title.improved {
+    background-color: #fee2e2;
+    color: var(--improved-color);
+}
+
+#variabilityModal .time-input-table td:first-child {
+    width: 90px;
+    font-size: 12px;
+}
+
+#variabilityModal .time-input-table thead th {
+    font-size: 11px;
+    padding: 8px 4px;
+}
+
+#variabilityEditorSection .variability-item-list {
+    overflow-y: auto;
+    padding-bottom: 10px;
+    padding-right: 5px;
+}
+
+/* バラつき編集モーダル内のテーブルに table-layout: fixed を適用 */
+#variabilityModal .time-input-table {
+    table-layout: fixed; /* これが最も重要な修正です */
+    width: 100%; /* テーブル全体の幅を100%に設定 */
+}
+
+/* 最初の列（ラベル）の幅を固定 */
+#variabilityModal .time-input-table td:first-child,
+#variabilityModal .time-input-table th:first-child {
+    width: 90px;
+    font-size: 12px;
+}
+
+/* 時間、分、秒の列は残りの幅を均等に分割 */
+#variabilityModal .time-input-table th {
+    font-size: 11px;
+    padding: 8px 4px;
+}
+
+/* 入力コントロールのスタイル */
+#variabilityModal .time-component {
+    width: 100%; /* 親要素の<td>の幅に追従 */
+    box-sizing: border-box; /* paddingとborderを幅に含める */
+    text-align: center; /* 中央揃え */
+}
+
+/* コントロールパネルのグループタイトル用スタイル */
+.control-panel .panel-title {
+    margin-top: 20px; /* 全てのタイトルにデフォルトで上マージンを適用 */
+}
+
+/* 各コントロールパネルの最初のタイトルのみ上マージンをなくす */
+#distributionPanelControls > .panel-title:first-of-type,
+#schedulePanelControls > .panel-title:first-of-type {
+    margin-top: 0;
+}
+
+
+
+/* スライドスイッチのスタイル */
+.slide-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+.slide-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slide-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+.slide-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.slide-switch input:checked + .slider {
+    background-color: var(--primary-color);
+}
+.slide-switch input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-color);
+}
+.slide-switch input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* 標準作業組合せ票のグループ */
+.gantt-toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* グループ内部ではgapをなくす */
+}
+
+/* 標準作業組合せ票のオプションコンテナ */
+.gantt-chart-options {
+    padding-left: 25px; 
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+.gantt-chart-options.visible {
+    max-height: 100px; /* 十分な高さを確保 */
+    opacity: 1;
+    margin-top: 12px; 
+}
+
+/* ボタン移動後に空になった ganttChartOptionsContainer の余白を除去
+   JS が visible クラスを付与し続けるため、ID 指定で上書きする       */
+#ganttChartOptionsContainer,
+#ganttChartOptionsContainer.gantt-chart-options,
+#ganttChartOptionsContainer.gantt-chart-options.visible {
+    max-height: 0 !important;
+    margin-top: 0 !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* =============================================
+   表示モード切替オーバーレイ
+   （標準作業組合せ票・頻度作業チャート共通）
+
+   認知心理学的設計：
+   ・横軸ラベル「0」位置（leftMargin）にボタン群の左端を揃える
+     → JS で style.left を描画毎に動的上書き（leftMargin の値そのまま）
+     → transform なし：左端揃えで視線の起点と一致
+   ・タイトルと同一の高さに配置（canvas baseY≈18px、ボタン高さ≈24px）
+     → top: 6px でボタン中央がタイトルベースライン付近に揃う
+   ・非アクティブ opacity:0.45 でOFF状態を直感的に識別
+============================================= */
+.display-mode-overlay {
+    position: absolute;
+    top:  6px;
+    left: 240px; /* drawGanttChart() で動的上書き */
+    z-index: 10;
+    display: flex;
+    gap: 5px;
+    pointer-events: auto;
+}
+
+/* 頻度作業チャート モード切替オーバーレイ */
+.frequency-mode-overlay {
+    position: absolute;
+    top:  6px;
+    left: 240px; /* drawFrequencyChart() で動的上書き */
+    z-index: 10;
+    display: none;
+    gap: 5px;
+    pointer-events: auto;
+}
+
+.frequency-mode-overlay.visible {
+    display: flex;
+}
+
+.dm-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 9px;
+    border: 1.5px solid #c1c9d4;
+    border-radius: 5px;
+    background: rgba(248, 250, 252, 0.92);
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: "Segoe UI", sans-serif;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease,
+                color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    white-space: nowrap;
+    user-select: none;
+    backdrop-filter: blur(2px);
+}
+
+.dm-toggle i {
+    font-size: 10px;
+}
+
+/* 非アクティブ（OFF）：透過でOFFを示唆 */
+.dm-toggle:not(.active) {
+    opacity: 0.45;
+}
+
+/* 改善前 アクティブ（黒系）── 両方ONでも同色を維持 */
+#dmCurrentBtn.active {
+    border-color: #374151;
+    background: #1f2937;
+    color: #ffffff;
+    opacity: 1;
+    box-shadow: 0 1px 4px rgba(31, 41, 55, 0.35);
+}
+
+/* 改善後 アクティブ（赤系）── 両方ONでも同色を維持 */
+#dmImprovedBtn.active {
+    border-color: #b91c1c;
+    background: #dc2626;
+    color: #ffffff;
+    opacity: 1;
+    box-shadow: 0 1px 4px rgba(220, 38, 38, 0.35);
+}
+
+.dm-toggle:hover {
+    opacity: 1;
+    filter: brightness(1.1);
+}
+
+.dm-toggle:active {
+    transform: scale(0.97);
+}
+
+/* =============================================
+   頻度作業チャート モードボタン ── ランプ配色
+   認知心理学的設計：
+   ・ランプの発光（box-shadow glow）で「現在の状態」を前注意的に伝達
+   ・実時間（stopwatch）= 青系: 測定・実測値の安定した印象
+   ・換算値（exchange）  = 琥珀系: 計算・変換値の注意喚起
+   ・非アクティブは共通の opacity:0.45 で統一（dm-toggle:not(.active) を継承）
+   ・アクティブ時のグローはそれぞれの色相に合わせた半透明シャドウ
+============================================= */
+/* 実時間ボタン アクティブ（青系ランプ）*/
+#freqActualTimeBtn.active {
+    border-color: #1d4ed8;
+    background: #2563eb;
+    color: #ffffff;
+    opacity: 1;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25),
+                0 0 8px  rgba(37, 99, 235, 0.40),
+                0 1px 3px rgba(0, 0, 0, 0.20);
+}
+
+/* 換算値ボタン アクティブ（琥珀色ランプ）*/
+#freqConvertedTimeBtn.active {
+    border-color: #b45309;
+    background: #d97706;
+    color: #ffffff;
+    opacity: 1;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25),
+                0 0 8px  rgba(217, 119, 6, 0.45),
+                0 1px 3px rgba(0, 0, 0, 0.20);
+}
+
+/* 表示モード選択ボタン（フォントサイズなどを調整） */
+.display-mode-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+}
+.mode-button {
+    padding: 6px 4px; /* 8px 6pxから縮小 */
+    border: 1px solid var(--border-light);
+    background: var(--background-white);
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 11px; /* 12pxから縮小 */
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px; /* 4pxから縮小 */
+}
+.mode-button:hover {
+    background: var(--background-subtle);
+    color: var(--text-primary);
+}
+.mode-button.active#currentModeBtn { background: var(--current-color); color: white; border-color: var(--current-color); }
+.mode-button.active#improvedModeBtn { background: var(--improved-color); color: white; border-color: var(--improved-color); }
+.mode-button.active#bothModeBtn { background: var(--both-mode-color); color: white; border-color: var(--both-mode-color); }
+.mode-button i { font-size: 12px; }
+
+/* ========================================
+   表示オプションのスタイル (新規追加・修正版)
+======================================== */
+.display-toggles-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.display-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--background-subtle);
+    padding: 6px 10px; /* 上下余白を削減 */
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+/* ラベルのスタイルをテーマに合わせて修正 */
+.display-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* 間隔を調整 */
+    font-size: 12px; /* フォントサイズを調整 */
+    font-weight: 600;
+    cursor: pointer;
+    /* デフォルトの色はグレー系にしておく */
+    color: var(--text-secondary); 
+}
+.display-toggle-label i {
+    font-size: 13px; /* アイコンサイズを調整 */
+    width: 16px;
+    text-align: center;
+    /* デフォルトのアイコン色 */
+    color: var(--text-secondary); 
+}
+
+/* 表示設定テーマが適用された場合のスタイル */
+.data-category.theme-display .display-toggle-label {
+    color: var(--theme-display-text);
+}
+.data-category.theme-display .display-toggle-label i {
+    color: var(--theme-display-icon);
+}
+
+.slide-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+.slide-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slide-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+.slide-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.slide-switch input:checked + .slider {
+    background-color: var(--primary-color);
+}
+.slide-switch input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-color);
+}
+.slide-switch input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+.gantt-toggle-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+
+.display-mode-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+}
+
+/* モードボタンのスタイルをテーマに合わせて修正 */
+.mode-button {
+    padding: 6px 4px; /* 上下余白を削減 */
+    font-size: 11px; /* 少し小さく */
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+/* 表示設定テーマが適用された場合の通常時のボタンスタイル */
+.data-category.theme-display .mode-button {
+    background: var(--theme-display-bg);
+    border-color: var(--theme-display-border);
+    color: var(--theme-display-text);
+}
+.data-category.theme-display .mode-button:hover {
+    background-color: #dbeafe;
+    border-color: #a5b4fc;
+}
+
+/* アクティブ時のボタンの色（黒・赤・紫）はそのまま維持 */
+.mode-button.active#currentModeBtn { background: var(--current-color); color: white; border-color: var(--current-color); }
+.mode-button.active#improvedModeBtn { background: var(--improved-color); color: white; border-color: var(--improved-color); }
+.mode-button.active#bothModeBtn { background: var(--both-mode-color); color: white; border-color: var(--both-mode-color); }
+
+.mode-button i { font-size: 12px; }
+
+/* ========================================
+   Scale Settings Styles (スケール設定) - Themed
+======================================== */
+
+/* スケール設定セクションのボタングリッド */
+.scale-mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+/* スケールモード選択ボタン（標準/頻度） */
+.btn-scale-mode {
+    background: var(--theme-display-bg); /* 表示設定テーマの背景色 (薄いIndigo) */
+    color: var(--theme-display-text);    /* 表示設定テーマの文字色 (濃いIndigo) */
+    border: 1px solid var(--theme-display-border);
+    font-weight: 600;
+    justify-content: flex-start; /* アイコンとテキストを左寄せ */
+    padding-left: 12px;
+}
+
+.btn-scale-mode:hover {
+    background: #e0e7ff; /* ホバー時の明るいIndigo */
+    border-color: #a5b4fc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.1);
+}
+
+.btn-scale-mode.active {
+    background: var(--theme-display-icon); /* アクティブ時はテーマのアイコン色 */
+    color: white;
+    border-color: var(--theme-display-icon);
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.btn-scale-mode.active:hover {
+    background: #4338ca; /* アクティブ時のホバー色 */
+}
+
+/* 手動調整スライダーグループ */
+.slider-control-group {
+    padding: 8px 10px;
+    border: 1px solid var(--theme-display-border);
+    background: var(--background-white);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 手動調整がアクティブな時のスタイル */
+.slider-control-group.active {
+    border-color: var(--theme-display-icon);
+    background: var(--theme-display-bg);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.slider-control-group.active .slider-labels label {
+    color: var(--theme-display-text);
+}
+
+.slider-control-group.active #scaleValueDisplay {
+    background-color: white;
+    color: var(--theme-display-text);
+    box-shadow: 0 0 0 1px var(--theme-display-border);
+}
+
+/* スライダーのつまみの色 */
+.scale-slider::-webkit-slider-thumb {
+    background: var(--border-strong);
+}
+.slider-control-group.active .scale-slider::-webkit-slider-thumb {
+    background: var(--theme-display-icon); /* アクティブ時のつまみ色 */
+}
+.scale-slider::-moz-range-thumb {
+    background: var(--border-strong);
+}
+.slider-control-group.active .scale-slider::-moz-range-thumb {
+    background: var(--theme-display-icon);
+}
+
+/* ========================================
+   頻度作業セクション
+======================================== */
+.frequency-work-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: var(--compact-spacing);
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    background: var(--background-white);
+}
+
+.frequency-work-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.frequency-work-item:last-child {
+    border-bottom: none;
+}
+
+.frequency-work-item:hover {
+    background: var(--background-subtle);
+}
+
+.frequency-work-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.frequency-work-name {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.frequency-work-details {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.frequency-work-time,
+.frequency-work-frequency {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.frequency-work-time i,
+.frequency-work-frequency i {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.frequency-work-stats {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: var(--compact-spacing);
+    padding: 4px;
+    background: var(--background-white);
+    border-radius: 3px;
+    border: 1px solid var(--border-light);
+}
+
+.frequency-work-actions {
+    display: flex;
+    gap: 3px;
+}
+
+/* ========================================
+   Frequency Work Modal Enhanced Styles
+======================================== */
+.frequency-input-group {
+    margin-top: 16px;
+}
+
+.input-group-label {
+    display: block;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.frequency-type-selector {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.frequency-type-selector label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.frequency-value-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--background-subtle);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.frequency-value-container input[type="number"] {
+    flex-grow: 1;
+}
+
+.frequency-value-container select {
+    max-width: 80px;
+}
+
+.frequency-value-container span {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+#frequencyWorkModal .time-input-section {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin-bottom: 12px;
+}
+
+#frequencyWorkModal .time-input-section .time-input-table {
+    margin-bottom: 0;
+}
+
+/* 頻度入力コンテナ内の要素の配置を調整 */
+.frequency-value-container {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 要素間の隙間 */
+}
+
+/* 「回数」と「時間」の数値を入力するinput欄のスタイル */
+.frequency-value-container input[type="number"] {
+    /* flex-grow: 1; を削除または上書き */
+    flex-grow: 0; /* 自動で伸びないように設定 */
+    width: 120px; /* 具体的な幅を指定 (この値はお好みで調整してください) */
+}
+
+/* 「回に1回」「に1回」というテキスト部分のスタイル */
+.frequency-value-container span {
+    /* 右側のテキストは自動で伸びるようにして、入力欄を左に寄せる */
+    flex-grow: 1; 
+    white-space: nowrap; /* テキストが折り返さないように */
+}
+
+/* 頻度作業モーダル内の影響度分析セクション */
+.impact-analysis-section {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: var(--background-subtle);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+}
+
+.impact-analysis-section .input-group-label {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.impact-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.impact-display i {
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.impact-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.impact-value {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: var(--primary-color);
+    background-color: var(--background-white);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.impact-formula {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    word-break: break-all;
+}
+
+/* 改善後タブの色調整 */
+#improvedFrequencyContent .impact-analysis-section {
+    background-color: rgba(220, 38, 38, 0.05);
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+#improvedFrequencyContent .impact-value {
+    color: var(--improved-color);
+}
+
+#improvedFrequencyContent .impact-display i {
+    color: var(--improved-color);
+}
+
+/* ========================================
+   Reorder Management Button Styles (並び替え管理ボタン)
+======================================== */
+
+/* 並び替えボタン（改善前/後）の共通スタイル */
+.btn-reorder {
+    background: var(--theme-edit-bg); /* チャート編集テーマの背景色（薄い緑） */
+    color: var(--theme-edit-text);    /* チャート編集テーマの文字色（濃い緑） */
+    border: 1px solid var(--theme-edit-border);
+    font-weight: 600;
+}
+
+.btn-reorder:hover {
+    background: #dcfce7; /* ホバー時の明るい緑 */
+    border-color: #86efac;
+    transform: translateY(-2px); /* 少し浮き上がる効果 */
+    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.1);
+}
+
+/* アイコンの色分け */
+.btn-reorder .icon-current {
+    color: var(--current-color); /* 改善前：黒 */
+}
+
+.btn-reorder .icon-improved {
+    color: var(--improved-color); /* 改善後：赤 */
+}
+
+/* 「改善後を改善前に揃える」ボタンのスタイル（プライマリーアクション） */
+.btn-reorder-align {
+    background: var(--theme-edit-icon); /* チャート編集テーマのアイコン色（鮮やかな緑） */
+    color: white;
+    font-weight: 700;
+    border: 1px solid var(--theme-edit-icon);
+}
+
+.btn-reorder-align:hover {
+    background: #19a270; /* より濃い緑 */
+    border-color: #6daf85;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+}
+
+/* ボタン内のアイコンとテキストの配置調整 */
+.btn-reorder i,
+.btn-reorder-align i {
+    margin-right: 6px;
+    font-size: 13px;
+}
+
+/* ========================================
+   Frequency Work Management Button Styles (頻度作業管理ボタン)
+======================================== */
+
+/* 「追加」ボタンのスタイル（プライマリーアクション） */
+.btn-frequency-add {
+    background: var(--theme-edit-icon); /* チャート編集テーマのアイコン色（鮮やかな緑） */
+    color: white;
+    font-weight: 700;
+    border: 1px solid var(--theme-edit-icon);
+}
+
+.btn-frequency-add:hover {
+    background: #16a34a; /* より濃い緑 */
+    border-color: #16a34a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.2);
+}
+
+/* 「全削除」ボタンのスタイル（セカンダリーアクション） */
+.btn-frequency-clear {
+    background: var(--theme-edit-bg); /* チャート編集テーマの背景色（薄い緑） */
+    color: var(--theme-edit-text);    /* チャート編集テーマの文字色（濃い緑） */
+    border: 1px solid var(--theme-edit-border);
+    font-weight: 600;
+}
+
+.btn-frequency-clear:hover {
+    background: #dcfce7; /* ホバー時の明るい緑 */
+    border-color: #86efac;
+}
+
+/* ボタン内のアイコン調整 */
+.btn-frequency-add i,
+.btn-frequency-clear i {
+    margin-right: 6px;
+    font-size: 13px;
+}
+
+/* ========================================
+   Modal Content Width Expansion (モーダル幅拡大)
+======================================== */
+
+.modal-content {
+    background-color: white;
+    margin: 3% auto;
+    padding: 24px;
+    border-radius: 8px;
+    width: 580px; /* 520px → 580px に拡大 */
+    max-width: 90%;
+    box-shadow: var(--shadow-lg);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid var(--border-color);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-wide {
+    width: 720px; /* 680px → 720px に拡大 */
+    max-width: 95%;
+}
+
+/* ========================================
+   Modal Header Actions (右寄せ配置版)
+======================================== */
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+    overflow: hidden;
+    min-height: 40px;
+}
+
+.modal-title {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    /* タイトル領域を調整 */
+    max-width: calc(100% - 350px);
+}
+
+/* ヘッダーアクション部分（右寄せ配置） */
+.modal-header-actions {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* ボタンを右寄せに配置 */
+    gap: 8px;
+    min-width: 340px;
+    max-width: 340px;
+    overflow: visible;
+}
+
+/* ヘッダー内のボタンスタイル（右寄せ対応版） */
+.modal-header-actions .btn {
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 0;
+    flex-shrink: 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: visible;
+    min-width: 100px;
+    /* ボタン内のテキストも中央揃え */
+    text-align: center;
+}
+
+/* プライマリボタン（保存） */
+.modal-header-actions .btn-primary {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 700;
+    padding: 6px 18px;
+    min-width: 120px;
+    width: 120px;
+}
+
+.modal-header-actions .btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+/* セカンダリボタン（元に戻す） */
+.modal-header-actions .btn-secondary {
+    background: var(--secondary-color);
+    color: white;
+    padding: 6px 16px;
+    min-width: 120px;
+    width: 120px;
+}
+
+.modal-header-actions .btn-secondary:hover {
+    background: #475569;
+}
+
+/* デンジャーボタン（削除） */
+.modal-header-actions .btn-danger {
+    background: var(--accent-color);
+    color: white;
+    padding: 6px 16px;
+    min-width: 80px;
+    width: 80px;
+}
+
+.modal-header-actions .btn-danger:hover {
+    background: #b91c1c;
+}
+
+/* 閉じるボタン（最右端に配置） */
+.modal-header-actions .close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+.modal-header-actions .close:hover {
+    background-color: var(--background-light);
+    color: var(--text-primary);
+}
+
+/* ボタン内のアイコンサイズ */
+.modal-header-actions .btn i {
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* ボタン内のテキスト（中央揃え） */
+.modal-header-actions .btn span {
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+}
+
+/* ========================================
+   レスポンシブ対応（右寄せ維持版）
+======================================== */
+
+/* 大画面での余裕あるサイズ */
+@media (min-width: 900px) {
+    .modal-content {
+        width: 600px;
+    }
+    
+    .modal-title {
+        max-width: calc(100% - 380px);
+    }
+    
+    .modal-header-actions {
+        min-width: 370px;
+        max-width: 370px;
+        justify-content: flex-end; /* 右寄せ維持 */
+    }
+    
+    .modal-header-actions .btn-secondary {
+        min-width: 130px;
+        width: 130px;
+    }
+    
+    .modal-header-actions .btn-primary {
+        min-width: 130px;
+        width: 130px;
+    }
+    
+    .modal-header-actions .btn-danger {
+        min-width: 90px;
+        width: 90px;
+    }
+}
+
+/* 中画面：右寄せ維持 */
+@media (max-width: 900px) {
+    .modal-title {
+        font-size: 17px;
+        max-width: calc(100% - 350px);
+    }
+    
+    .modal-header-actions {
+        min-width: 340px;
+        max-width: 340px;
+        justify-content: flex-end; /* 右寄せ維持 */
+    }
+}
+
+/* 小画面：アイコンのみでも右寄せ */
+@media (max-width: 700px) {
+    .modal-content {
+        width: 95%;
+    }
+    
+    .modal-title {
+        max-width: calc(100% - 180px);
+    }
+    
+    .modal-header-actions {
+        min-width: 170px;
+        max-width: 170px;
+        gap: 4px;
+        justify-content: flex-end; /* 右寄せ維持 */
+    }
+    
+    /* テキストを非表示にしてアイコンのみに */
+    .modal-header-actions .btn span {
+        display: none;
+    }
+    
+    .modal-header-actions .btn {
+        padding: 6px;
+        min-width: 34px;
+        width: 34px;
+        height: 34px;
+    }
+    
+    .modal-header-actions .btn-primary {
+        min-width: 34px;
+        width: 34px;
+    }
+    
+    .modal-header-actions .btn-secondary {
+        min-width: 34px;
+        width: 34px;
+    }
+    
+    .modal-header-actions .btn-danger {
+        min-width: 34px;
+        width: 34px;
+    }
+    
+    .modal-header-actions .close {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+    }
+}
+
+/* 極小画面：最小サイズでも右寄せ */
+@media (max-width: 400px) {
+    .modal-header {
+        gap: 8px;
+    }
+    
+    .modal-title {
+        font-size: 14px;
+        max-width: calc(100% - 160px);
+    }
+    
+    .modal-header-actions {
+        min-width: 150px;
+        max-width: 150px;
+        gap: 3px;
+        justify-content: flex-end; /* 右寄せ維持 */
+    }
+    
+    .modal-header-actions .btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        padding: 5px;
+    }
+    
+    .modal-header-actions .btn-primary,
+    .modal-header-actions .btn-secondary,
+    .modal-header-actions .btn-danger {
+        min-width: 30px;
+        width: 30px;
+    }
+    
+    .modal-header-actions .close {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        font-size: 16px;
+    }
+}
+
+/* バラつき編集モーダルの幅を調整 */
+#variabilityModal .modal-content {
+    width: 580px;
+}
+
+/* 1. モーダル自体の幅を広げる */
+#variabilityModal .modal-content {
+    width: 640px; /* 580pxから拡大 */
+}
+
+/* 2. タイトルが改行されるように設定 */
+#variabilityModal .modal-title {
+    white-space: normal;  /* テキストの改行を許可 */
+    overflow: visible;      /* はみ出しを許容 */
+    text-overflow: clip;    /* '...'での省略を無効化 */
+    line-height: 1.4;       /* 行間を調整して見やすくする */
+    flex-grow: 1;           /* 利用可能なスペースを最大限使用する */
+}
+
+/* 3. ボタンコンテナの最小幅をリセットし、タイトル領域を確保 */
+#variabilityModal .modal-header-actions {
+    min-width: auto;      /* 固定の最小幅を解除 */
+    flex-shrink: 0;       /* ボタン群自体が縮まないようにする */
+}
+/* ========================================
+   Panel Sub-Tab Navigation
+   タブ×アコーディオン パネル内サブタブ
+======================================== */
+
+/* パネル内タブ共通スタイル（ベース形状） */
+.panel-sub-nav,
+.panel-sub-nav--common {
+    display: flex;
+    padding: 4px;                 /* paddingを統一 */
+    border-radius: 8px;           /* 角丸を統一 */
+    gap: 4px;                     /* gapを統一 */
+    margin-bottom: 12px;
+}
+
+/* ── ガントパネル用ナビ（青系グループ） ── */
+.panel-sub-nav {
+    background: #dbeafe;          /* blue-100: チャート操作グループ */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 1px 0 rgba(37, 99, 235, 0.10);
+    border: 1px solid rgba(37, 99, 235, 0.1); /* 境界線を追加 */
+}
+
+/* ── 共通パネル用ナビ（スレート系グループ） ── */
+.panel-sub-nav--common {
+    background: #e2e8f0;          /* slate-200: データ/システム管理グループ */
+    margin-top: 20px;             /* 上のマージンを確保 */
+    position: static;
+    box-shadow: none;
+    border: 1px solid #cbd5e1;    /* 境界線を追加して形状を明確に */
+}
+
+/* タブボタン共通 */
+.panel-sub-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 4px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;           /* ボタンの角丸 */
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.panel-sub-tab i {
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+/* ガントパネル タブ ホバー */
+.panel-sub-nav:not(.panel-sub-nav--common) .panel-sub-tab:hover {
+    background: rgba(255, 255, 255, 0.5); /* ホバー色を少しマイルドに */
+    color: #1d4ed8;
+}
+
+/* ガントパネル タブ アクティブ */
+.panel-sub-nav:not(.panel-sub-nav--common) .panel-sub-tab.active {
+    background: #ffffff;
+    color: var(--primary-color);
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.15); /* シャドウをメインタブと合わせる */
+}
+
+/* 共通パネル タブ ホバー */
+.panel-sub-nav--common .panel-sub-tab:hover {
+    background: rgba(255, 255, 255, 0.5);
+    color: #1e293b;
+}
+
+/* 共通パネル タブ アクティブ */
+.panel-sub-nav--common .panel-sub-tab.active {
+    background: #ffffff;
+    color: #334155;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* シャドウをメインタブと合わせる */
+}
+
+/* タブコンテンツ（非表示） */
+.panel-sub-content {
+    display: none;
+}
+
+/* タブコンテンツ（表示） */
+.panel-sub-content.active {
+    display: block;
+    animation: fadeIn 0.2s ease-out; /* 切り替え時のフェードインを追加 */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ========================================
+/* ============================================================
+   Scale Controls Constrained State
+   2サイクル表示ON時: 無効化ではなく制約モード表示
+   ─ グレーアウトせず、制約値をインジケーターで明示する
+============================================================ */
+
+/* ── controls-disabled は後方互換のため残すが controls-constrained に統合 ── */
+#scaleModeSection.controls-disabled .scale-mode-buttons,
+#scaleModeSection.controls-constrained .scale-mode-buttons {
+    /* 操作可能なのでopacity/pointer-eventsは変更しない */
+}
+
+/* 制約インジケーター（2サイクル時のみ表示） */
+.scale-constraint-info {
+    display: none;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+    padding: 4px 8px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #4338ca;
+    font-weight: 500;
+    user-select: none;
+}
+
+.scale-constraint-info i {
+    font-size: 10px;
+    color: #6366f1;
+    flex-shrink: 0;
+}
+
+.scale-constraint-info strong {
+    color: #3730a3;
+    font-weight: 700;
+}
+
+.scale-constraint-reason {
+    color: #818cf8;
+    font-size: 10px;
+}
+
+/* 制約モード中のセクションヘッダーバッジ */
+#scaleModeSection.controls-constrained .category-icon::after,
+#scaleModeSection.controls-disabled   .category-icon::after {
+    content: "2サイクル制約中";
+    display: inline-block;
+    font-size: 9px;
+    color: #4f46e5;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-left: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* 制約モード中のスライダーはアクセント色で強調（制約があることを視覚的に示す） */
+#scaleModeSection.controls-constrained .scale-slider::-webkit-slider-thumb,
+#scaleModeSection.controls-disabled   .scale-slider::-webkit-slider-thumb {
+    background: #6366f1;
+}
+#scaleModeSection.controls-constrained .scale-slider::-moz-range-thumb,
+#scaleModeSection.controls-disabled   .scale-slider::-moz-range-thumb {
+    background: #6366f1;
+}
+
+/* =============================================
+   まとめづくり ステッパーコントロール
+   ============================================= */
+
+/* ラッパー */
+.batch-stepper-wrap {
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+/* ラベル行（テキスト + ON/OFFバッジ） */
+.batch-stepper-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.batch-stepper-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ON/OFFバッジ */
+.batch-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+
+.batch-mode-off {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #cbd5e1;
+}
+
+.batch-mode-on {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #fff;
+    border: 1px solid #b91c1c;
+    box-shadow: 0 1px 4px rgba(220, 38, 38, 0.35);
+}
+
+/* ステッパーコントロール行 */
+/* T/T情報表示（使用箇所なし：削除済み） */
+
+/* batchSettingsContainer 内のスライドスイッチをコンパクト化 */
+#batchSettingsContainer .slide-switch {
+    width: 32px;
+    height: 18px;
+}
+#batchSettingsContainer .slide-switch .slider {
+    border-radius: 18px;
+}
+#batchSettingsContainer .slide-switch .slider:before {
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+}
+#batchSettingsContainer .slide-switch input:checked + .slider:before {
+    transform: translateX(14px);
+}
+
+/* ========================================
+   Standard WIP Card (標準手持ちカード)
+======================================== */
+
+/* カードテーマ：Teal系（工程管理の意味合いに合わせた落ち着いた色） */
+.standard-wip-card {
+    border-color: #99f6e4;
+    background: rgba(20, 184, 166, 0.04);
+}
+
+.standard-wip-card:hover {
+    border-color: #2dd4bf;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+}
+
+/* アイコンは共通 .setting-icon を使うので、色のみ上書き */
+.standard-wip-icon {
+    background: rgba(13, 148, 136, 0.1);
+    color: #0d9488;
+    border: 1px solid rgba(13, 148, 136, 0.2);
+}
+
+/* ステッパーコントロール */
+/* WIP・まとめ数: setting-input と同形式の数値入力 */
+.setting-input--wip,
+.setting-input--batch {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+.setting-input--wip { color: #0d9488; }
+.setting-input--batch { color: #94a3b8; }         /* 未有効 = グレー */
+.setting-input--batch.is-active { color: #dc2626; } /* 有効(≥2) = 赤 */
+
+/* ========================================
+   Screenshot Manager Styles
+   画像出力モジュール関連スタイル
+======================================== */
+
+/* ── パネル内チャート状態インジケーター ── */
+.screenshot-panel-status {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.screenshot-panel-status-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    background: var(--background-subtle);
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.screenshot-panel-chart-icon {
+    font-size: 10px;
+    width: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.screenshot-panel-chart-name {
+    flex: 1;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+/* ON / OFF バッジ */
+.screenshot-panel-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    letter-spacing: 0.3px;
+}
+
+.screenshot-panel-badge--on {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.screenshot-panel-badge--off {
+    background: #f1f5f9;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+/* ── 画像出力ボタン ── */
+.btn-screenshot-single {
+    background: #0284c7;          /* Sky-600 */
+    color: white;
+    font-weight: 600;
+}
+.btn-screenshot-single:hover {
+    background: #0369a1;          /* Sky-700 */
+}
+
+.btn-screenshot-split {
+    background: #7c3aed;          /* Violet-600 */
+    color: white;
+    font-weight: 600;
+}
+.btn-screenshot-split:hover {
+    background: #6d28d9;          /* Violet-700 */
+}
+
+/* ── トースト通知 ── */
+.screenshot-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: var(--shadow-lg);
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    white-space: nowrap;
+}
+
+.screenshot-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.screenshot-toast--success {
+    background: #064e3b;
+    color: #d1fae5;
+}
+
+.screenshot-toast--warn {
+    background: #78350f;
+    color: #fef3c7;
+}
+
+.screenshot-toast--error {
+    background: #7f1d1d;
+    color: #fee2e2;
+}
+
+/* ── 進捗オーバーレイ ── */
+.screenshot-progress-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.screenshot-progress-overlay--visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.screenshot-progress-box {
+    background: white;
+    border-radius: 8px;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-lg);
+}
+
+.screenshot-progress-box .fa-spinner {
+    font-size: 18px;
+    color: var(--primary-color);
+}
+
+/* ── 分割出力モーダル ── */
+.screenshot-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 5000;
+    align-items: center;
+    justify-content: center;
+}
+
+.screenshot-modal {
+    background: white;
+    border-radius: 10px;
+    width: 380px;
+    max-width: 92vw;
+    box-shadow: var(--shadow-lg);
+    animation: screenshotModalIn 0.22s ease-out;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+}
+
+@keyframes screenshotModalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.screenshot-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    color: white;
+}
+
+.screenshot-modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.screenshot-modal-icon {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.screenshot-modal-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.screenshot-modal-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: white;
+    border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+}
+.screenshot-modal-close:hover {
+    background: rgba(255,255,255,0.28);
+}
+
+.screenshot-modal-body {
+    padding: 16px;
+}
+
+.screenshot-modal-desc {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+/* モーダル内チャート状態 */
+.screenshot-chart-status {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.screenshot-chart-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    transition: background 0.15s ease;
+}
+
+.screenshot-chart-item--on {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+.screenshot-chart-item--off {
+    background: var(--background-subtle);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+.screenshot-chart-item-icon {
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.screenshot-chart-item-type {
+    font-size: 11px;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+.screenshot-chart-item span:last-of-type {
+    /* チャート名 */
+    flex: 1;
+    font-weight: 600;
+}
+
+.screenshot-chart-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    letter-spacing: 0.4px;
+}
+
+.screenshot-chart-badge--on {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.screenshot-chart-badge--off {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+/* 分割数コントロール */
+.screenshot-split-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 14px;
+}
+
+.screenshot-split-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.screenshot-split-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.screenshot-split-adj {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--background-subtle);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+}
+.screenshot-split-adj:hover {
+    background: #e2e8f0;
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.screenshot-split-input {
+    width: 64px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: white;
+    -moz-appearance: textfield;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.screenshot-split-input:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+}
+.screenshot-split-input::-webkit-outer-spin-button,
+.screenshot-split-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.screenshot-split-unit {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.screenshot-split-hint {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+.screenshot-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    background: var(--background-subtle);
+}
+
+.screenshot-export-btn {
+    background: #7c3aed;
+    gap: 6px;
+}
+.screenshot-export-btn:hover:not(:disabled) {
+    background: #6d28d9;
+}
+.screenshot-export-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* END OF FILE styles.css */
+/* ========================================
+   File Manager Panel & Current File Display
+======================================== */
+.current-file-display {
+    display:flex;align-items:center;gap:8px;padding:6px 10px;
+    border:1px solid var(--border-color);border-radius:6px;
+    background:var(--background-white);cursor:pointer;
+    transition:all 0.2s ease;min-width:185px;max-width:260px;user-select:none;
+}
+.current-file-display:hover { border-color:var(--primary-color);background:#f0f7ff;box-shadow:0 0 0 2px rgba(37,99,235,0.08); }
+.current-file-display > i:first-child { font-size:14px;color:var(--primary-color);flex-shrink:0; }
+.current-file-text { flex:1;min-width:0;display:flex;flex-direction:column;gap:1px; }
+.current-file-name { font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.current-file-meta { font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.current-file-chevron { font-size:10px;color:var(--text-muted);flex-shrink:0;transition:transform 0.2s; }
+.btn-save-main {
+    display:flex;align-items:center;gap:5px;padding:7px 12px;font-size:12px;font-weight:700;
+    border-radius:6px;background:linear-gradient(135deg,var(--primary-color) 0%,#3b82f6 100%);
+    color:white;border:none;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;
+    box-shadow:0 1px 3px rgba(37,99,235,0.3);
+}
+.btn-save-main:hover { background:linear-gradient(135deg,#1d4ed8 0%,var(--primary-color) 100%);transform:translateY(-1px); }
+.file-manager-panel {
+    position:absolute;top:calc(100% + 6px);right:0;width:320px;background:#ffffff;
+    border:1px solid var(--border-color);border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.12),0 2px 8px rgba(0,0,0,0.06);
+    z-index:10000;overflow:hidden;animation:fmpSlideIn 0.18s ease-out;
+}
+@keyframes fmpSlideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+.fmp-header { display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#f8fafc,#e2e8f0);border-bottom:1px solid var(--border-light); }
+.fmp-title { font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:6px; }
+.fmp-title i { color:var(--primary-color); }
+.fmp-close-btn { width:24px;height:24px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.15s; }
+.fmp-close-btn:hover { background:var(--background-light);color:var(--text-primary); }
+.fmp-section-label { font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em; }
+.fmp-section { padding:10px 14px;border-bottom:1px solid var(--border-light);background:#fafbff; }
+.fmp-current-info { display:flex;align-items:center;gap:8px;margin:6px 0 8px; }
+.fmp-current-icon { font-size:18px;color:var(--primary-color);flex-shrink:0; }
+.fmp-current-details { flex:1;min-width:0; }
+.fmp-current-name { font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.fmp-current-meta { font-size:11px;color:var(--text-secondary);margin-top:1px; }
+.fmp-action-row { display:flex;gap:6px; }
+.fmp-btn-save { flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 0;font-size:11px;font-weight:600;border-radius:5px;background:linear-gradient(135deg,var(--primary-color),#3b82f6);color:white;border:none;cursor:pointer;transition:all 0.2s; }
+.fmp-btn-save:hover { filter:brightness(1.1);transform:translateY(-1px); }
+.fmp-btn-saveas { flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 0;font-size:11px;font-weight:600;border-radius:5px;background:#f1f5f9;color:var(--text-primary);border:1px solid var(--border-color);cursor:pointer;transition:all 0.2s; }
+.fmp-btn-saveas:hover { background:#e2e8f0;transform:translateY(-1px); }
+.fmp-list-header { display:flex;align-items:center;justify-content:space-between;padding:8px 14px 4px; }
+.fmp-count { font-size:11px;font-weight:600;color:var(--primary-color);background:#eff6ff;padding:1px 6px;border-radius:10px; }
+.fmp-list { max-height:200px;overflow-y:auto;padding:4px 8px;scrollbar-width:thin;scrollbar-color:var(--border-color) transparent; }
+.fmp-list::-webkit-scrollbar { width:4px; }
+.fmp-list::-webkit-scrollbar-thumb { background:var(--border-color);border-radius:2px; }
+.fmp-empty { text-align:center;color:var(--text-muted);font-size:12px;padding:16px 10px;line-height:1.8; }
+.fmp-item { display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:background 0.15s;margin-bottom:2px;border:1px solid transparent; }
+.fmp-item:hover { background:#f0f7ff;border-color:#bfdbfe; }
+.fmp-item.active { background:#eff6ff;border-color:#93c5fd; }
+.fmp-item-check { width:14px;flex-shrink:0;font-size:11px;color:var(--primary-color);font-weight:700; }
+.fmp-item-info { flex:1;min-width:0; }
+.fmp-item-name { font-size:12px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.fmp-item.active .fmp-item-name { color:var(--primary-color); }
+.fmp-item-meta { font-size:10px;color:var(--text-muted);margin-top:1px; }
+.fmp-item-date { font-style:italic; }
+.fmp-delete-btn { width:22px;height:22px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--text-muted);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0;transition:all 0.15s; }
+.fmp-item:hover .fmp-delete-btn { opacity:1; }
+.fmp-delete-btn:hover { background:#fee2e2;color:#dc2626; }
+.fmp-transfer-section { padding:8px 14px 12px;border-top:1px solid var(--border-light);background:#f8fafc; }
+.fmp-transfer-group { margin-top:8px; }
+.fmp-transfer-group-label { display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:5px;padding-bottom:3px;border-bottom:1px dashed var(--border-light); }
+.fmp-transfer-buttons { display:flex;gap:5px; }
+.fmp-btn-export-single { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;font-size:10px;font-weight:600;border-radius:6px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:white;border:none;cursor:pointer;transition:all 0.2s;line-height:1.2; }
+.fmp-btn-export-all { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;font-size:10px;font-weight:600;border-radius:6px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;cursor:pointer;transition:all 0.2s;line-height:1.2; }
+.fmp-btn-import-replace { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;font-size:10px;font-weight:600;border-radius:6px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:white;border:none;cursor:pointer;transition:all 0.2s;line-height:1.2; }
+.fmp-btn-import-add { flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 4px;font-size:10px;font-weight:600;border-radius:6px;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;cursor:pointer;transition:all 0.2s;line-height:1.2; }
+.fmp-btn-export-single:hover,.fmp-btn-export-all:hover,.fmp-btn-import-replace:hover,.fmp-btn-import-add:hover { filter:brightness(1.08);transform:translateY(-1px); }
+.fmp-btn-export-single i,.fmp-btn-export-all i,.fmp-btn-import-replace i,.fmp-btn-import-add i { font-size:13px; }
+
+/* ========================================
+   全件バックアップ（左メニュー）
+======================================== */
+.data-scope-note { display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);background:#eff6ff;border:1px solid #bfdbfe;border-radius:5px;padding:5px 8px;margin-bottom:8px; }
+.data-scope-note i { color:var(--primary-color);font-size:12px;flex-shrink:0; }
+.data-danger-note { display:flex;align-items:center;gap:6px;font-size:10px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:4px 8px;margin-top:8px; }
+.data-danger-note i { font-size:11px;flex-shrink:0; }
+.btn-all-export { display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;font-size:11px;font-weight:600;border-radius:5px;background:linear-gradient(135deg,#f59e0b,#d97706);color:white;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
+.btn-all-export:hover { filter:brightness(1.08);transform:translateY(-1px); }
+.btn-all-import { display:flex;align-items:center;justify-content:center;gap:5px;padding:7px 8px;font-size:11px;font-weight:600;border-radius:5px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
+.btn-all-import:hover { filter:brightness(1.08);transform:translateY(-1px); }
+
+/* ========================================
+   競合ポリシー / 確認ダイアログ
+======================================== */
+.conflict-dialog-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(2px);z-index:20000;display:flex;align-items:center;justify-content:center;animation:overlayFadeIn 0.15s ease; }
+@keyframes overlayFadeIn { from{opacity:0} to{opacity:1} }
+.conflict-dialog { background:#ffffff;border-radius:12px;width:400px;max-width:92vw;box-shadow:0 20px 40px rgba(0,0,0,0.2);animation:dialogSlideIn 0.18s ease-out; }
+@keyframes dialogSlideIn { from{opacity:0;transform:translateY(-12px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+.conflict-dialog-header { display:flex;align-items:center;gap:10px;padding:14px 16px;font-size:14px;font-weight:700;color:var(--text-primary);border-bottom:1px solid var(--border-light);background:linear-gradient(135deg,#f8fafc,#e2e8f0);border-radius:12px 12px 0 0; }
+.conflict-dialog-body { padding:14px 16px; }
+.conflict-dialog-desc { font-size:13px;color:var(--text-secondary);margin:0 0 10px;line-height:1.6; }
+.conflict-name-list { background:#f8fafc;border:1px solid var(--border-light);border-radius:6px;padding:8px 12px 8px 24px;margin:0 0 12px;font-size:12px;color:var(--text-primary);line-height:1.8; }
+.conflict-policy-options { display:flex;flex-direction:column;gap:6px; }
+.conflict-policy-item { display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:7px;border:1.5px solid var(--border-light);cursor:pointer;transition:all 0.15s;background:#fafafa; }
+.conflict-policy-item:hover { background:#f0f7ff;border-color:#93c5fd; }
+.conflict-policy-item input[type=radio] { margin-top:2px;flex-shrink:0;accent-color:var(--primary-color); }
+.conflict-policy-item:has(input:checked) { background:#eff6ff;border-color:var(--primary-color); }
+.conflict-policy-content { display:flex;flex-direction:column;gap:2px; }
+.conflict-policy-title { font-size:12px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:5px; }
+.conflict-policy-title i { color:var(--primary-color);font-size:11px; }
+.conflict-policy-desc { font-size:10px;color:var(--text-muted);line-height:1.5; }
+.conflict-dialog-footer { display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;border-top:1px solid var(--border-light);background:#f8fafc;border-radius:0 0 12px 12px; }
+.conflict-btn-cancel { padding:7px 14px;font-size:12px;font-weight:600;border-radius:6px;background:#f1f5f9;color:var(--text-secondary);border:1px solid var(--border-color);cursor:pointer;transition:all 0.2s; }
+.conflict-btn-cancel:hover { background:#e2e8f0; }
+.conflict-btn-confirm { padding:7px 16px;font-size:12px;font-weight:700;border-radius:6px;background:linear-gradient(135deg,var(--primary-color),#3b82f6);color:white;border:none;cursor:pointer;transition:all 0.2s; }
+.conflict-btn-confirm:hover { filter:brightness(1.08);transform:translateY(-1px); }
+.fmp-btn-danger { padding:7px 16px;font-size:12px;font-weight:700;border-radius:6px;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;border:none;cursor:pointer;transition:all 0.2s; }
+.fmp-btn-danger:hover { filter:brightness(1.08);transform:translateY(-1px); }
+
+/* ========================================
+   CSV 読み書きセクション（左メニュー）
+======================================== */
+.csv-scope-badge { display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:5px 8px;margin-bottom:8px; }
+.csv-scope-badge i { color:#16a34a;font-size:11px;flex-shrink:0; }
+.csv-scope-badge strong { color:#15803d; }
+.csv-main-actions { display:flex;gap:6px;margin-bottom:8px; }
+.csv-action-btn { flex:1;display:flex;align-items:center;gap:8px;padding:8px;border:none;border-radius:7px;cursor:pointer;transition:all 0.2s ease;text-align:left;box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+.csv-action-btn:hover { transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,0.15); }
+.csv-write-btn { background:linear-gradient(135deg,#0d9488,#0f766e);color:white; }
+.csv-read-btn { background:linear-gradient(135deg,#4f46e5,#4338ca);color:white; }
+.csv-btn-arrow { font-size:16px;font-weight:900;flex-shrink:0;opacity:0.9;line-height:1; }
+.csv-btn-body { display:flex;flex-direction:column;gap:1px; }
+.csv-btn-label { font-size:12px;font-weight:700;line-height:1.2; }
+.csv-btn-sub { font-size:9px;opacity:0.8;line-height:1.2; }
+.csv-drop-zone { display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;border:1.5px dashed #a5b4fc;border-radius:6px;background:#f5f3ff;cursor:pointer;transition:all 0.2s ease;margin-bottom:7px;user-select:none; }
+.csv-drop-zone:hover { background:#ede9fe;border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,0.08); }
+.csv-drop-zone.drag-over { background:#ddd6fe;border-color:#7c3aed;border-style:solid; }
+.csv-drop-icon { font-size:16px;color:#7c3aed;flex-shrink:0; }
+.csv-drop-text { font-size:10px;color:#6d28d9;text-align:center;line-height:1.4; }
+.csv-ref-details { border:1px solid var(--border-light);border-radius:6px;overflow:hidden; }
+.csv-ref-summary { display:flex;align-items:center;gap:6px;padding:7px 10px;background:#f8fafc;cursor:pointer;font-size:11px;font-weight:600;color:var(--text-secondary);list-style:none;user-select:none;transition:background 0.15s; }
+.csv-ref-summary::-webkit-details-marker { display:none; }
+.csv-ref-summary:hover { background:#f1f5f9;color:var(--text-primary); }
+.csv-ref-summary i:first-child { color:var(--primary-color);font-size:11px; }
+.csv-ref-summary span { flex:1; }
+.csv-ref-chevron { font-size:9px;color:var(--text-muted);transition:transform 0.2s; }
+.csv-ref-details[open] .csv-ref-chevron { transform:rotate(180deg); }
+.csv-ref-details[open] .csv-ref-summary { background:#eff6ff;color:var(--primary-color); }
+.csv-ref-body { padding:10px 10px 8px;background:#ffffff;border-top:1px solid var(--border-light); }
+.csv-col-guide { display:flex;flex-direction:column;gap:3px;margin-bottom:8px; }
+.csv-col-item { display:flex;align-items:center;gap:6px;padding:4px 7px;border-radius:4px;font-size:11px; }
+.csv-col-required { background:#f0fdf4;border-left:3px solid #16a34a; }
+.csv-col-optional { background:#fafafa;border-left:3px solid var(--border-color);opacity:0.8; }
+.csv-col-num { font-weight:700;font-size:11px;color:var(--text-muted);width:18px;flex-shrink:0; }
+.csv-col-name { flex:1;font-weight:600;color:var(--text-primary); }
+.csv-col-type { font-size:10px;color:var(--text-muted);background:rgba(0,0,0,0.04);padding:1px 5px;border-radius:3px; }
+.csv-ref-note { font-size:10px;color:var(--text-secondary);background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:5px 7px;margin:0 0 8px;display:flex;align-items:flex-start;gap:5px;line-height:1.5; }
+.csv-ref-note i { color:#d97706;font-size:10px;flex-shrink:0;margin-top:1px; }
+.csv-sample-row { display:flex;align-items:center;gap:6px; }
+.csv-sample-label { font-size:10px;color:var(--text-muted);white-space:nowrap; }
+.csv-sample-btn { display:flex;align-items:center;gap:4px;padding:4px 8px;font-size:10px;font-weight:600;border-radius:4px;background:#f1f5f9;color:var(--text-secondary);border:1px solid var(--border-color);cursor:pointer;transition:all 0.15s; }
+.csv-sample-btn:hover { background:#e2e8f0;color:var(--text-primary); }
+
+/* ========================================
+   CSV プレビュー確認モーダル
+======================================== */
+.csv-preview-modal { width:600px;max-width:95vw;display:flex;flex-direction:column;max-height:85vh; }
+.csv-preview-modal-title { display:flex;align-items:center;gap:10px; }
+.csv-preview-summary { padding:12px 20px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px; }
+.csv-preview-count-block { display:flex;align-items:baseline;gap:6px; }
+.csv-preview-count-num { font-size:26px;font-weight:800;color:#15803d;line-height:1; }
+.csv-preview-count-label { font-size:13px;color:var(--text-secondary); }
+.csv-preview-skipped { display:flex;align-items:center;gap:5px;font-size:11px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:3px 8px; }
+.csv-preview-skipped i { color:#d97706; }
+.csv-preview-table-wrap { flex:1;overflow-y:auto;padding:14px 20px 8px; }
+.csv-preview-table-label { font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:7px;display:flex;align-items:center;gap:5px; }
+.csv-preview-table-label i { color:var(--primary-color); }
+.csv-preview-table { width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--border-color);border-radius:6px;overflow:hidden; }
+.csv-preview-table thead th { background:var(--background-subtle);padding:7px 10px;text-align:left;font-weight:700;color:var(--text-primary);font-size:11px;border-bottom:1px solid var(--border-color); }
+.csv-preview-table tbody tr:hover { background:#f8fafc; }
+.csv-preview-table tbody tr:last-child td { border-bottom:none; }
+.csv-preview-table td { padding:6px 10px;border-bottom:1px solid var(--border-light); }
+.csv-pt-num { text-align:center;color:var(--text-muted);font-size:11px;width:30px; }
+.csv-pt-name { font-weight:600;color:var(--text-primary);max-width:200px; }
+.csv-pt-time { text-align:right;color:var(--text-secondary);font-size:11px;white-space:nowrap; }
+.csv-pt-cat { display:inline-block;font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px; }
+.csv-cat-normal  { background:#dbeafe;color:#1d4ed8; }
+.csv-cat-monitor { background:#fef9c3;color:#854d0e; }
+.csv-cat-hold    { background:#fce7f3;color:#9d174d; }
+.csv-cat-wait    { background:#f3f4f6;color:#374151; }
+.csv-preview-more { font-size:11px;color:var(--text-muted);text-align:right;margin:6px 0 0;font-style:italic; }
+.csv-preview-impact { display:flex;align-items:center;gap:8px;padding:10px 20px;background:#fff7ed;border-top:1px solid #fed7aa;font-size:12px;color:#9a3412; }
+.csv-preview-impact i { color:#ea580c;flex-shrink:0; }
+.csv-preview-impact strong { color:#c2410c; }
+.btn-success { display:flex;align-items:center;gap:5px;padding:8px 16px;font-size:13px;font-weight:700;border-radius:6px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;cursor:pointer;transition:all 0.2s; }
+.btn-success:hover { filter:brightness(1.08);transform:translateY(-1px); }
+
+/* ========================================
+   標準作業 空状態オンボーディングカード (Gantt Empty State)
+   ─────────────────────────────────────
+   認知心理学の適用:
+   ・シグニファイア    : 明示的なCTAボタンで操作を誘引（ダブルクリック不要）
+   ・チャンク化       : 3ステップフローでタスクを分解・可視化
+   ・アフォーダンス   : ボタン形状でクリック可能を明示
+   ・視覚的階層       : タイトル→説明→ステップ→ボタンの明確な優先順位
+   ・注意誘導         : border-pulse アニメで視線を自然に集める
+   配色: Indigo系（既存テーマ display と連携）
+======================================== */
+
+.gantt-empty-state {
+    margin: 8px 0 6px;
+    border-radius: 10px;
+    border: 1.5px dashed rgba(99, 102, 241, 0.35);
+    background: linear-gradient(145deg, #fafbff 0%, #f0f2ff 100%);
+    cursor: default;
+    position: relative;
+    width: calc(100% - 2px);
+    min-width: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    animation: ges-border-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ges-border-pulse {
+    0%, 100% { border-color: rgba(99, 102, 241, 0.28); }
+    50%       { border-color: rgba(99, 102, 241, 0.58); }
+}
+
+/* 左端 Indigo アクセントバー */
+.gantt-empty-state::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #6366f1 0%, #818cf8 100%);
+    border-radius: 9px 0 0 9px;
+}
+
+/* 縦積みレイアウトのコンテナ */
+.ges-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 24px 24px;
+    gap: 16px;
+}
+
+/* アイコンリング（多重光輪で重要度を強調） */
+.ges-icon-ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(129,140,248,0.18) 100%);
+    border: 1.5px solid rgba(99, 102, 241, 0.28);
+    box-shadow: 0 0 0 7px rgba(99,102,241,0.06), 0 0 0 13px rgba(99,102,241,0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* テキストブロック */
+.ges-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.ges-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.ges-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.55;
+}
+
+/* 3ステップフロー（チャンク化による認知負荷低減） */
+.ges-steps {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.ges-step {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #ffffff;
+    border: 1px solid rgba(99,102,241,0.22);
+    border-radius: 20px;
+    padding: 4px 10px 4px 5px;
+    box-shadow: 0 1px 3px rgba(99,102,241,0.07);
+    white-space: nowrap;
+}
+
+.ges-step-num {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #818cf8);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ges-step-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4338ca;
+}
+
+.ges-step-arr {
+    color: rgba(99,102,241,0.38);
+    font-size: 9px;
+    flex-shrink: 0;
+}
+
+/* CTAボタングループ */
+.ges-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* プライマリボタン: Fitts の法則 — 大きく・目立つ */
+.ges-btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: 0 2px 10px rgba(79,70,229,0.30);
+    font-family: inherit;
+    letter-spacing: 0.01em;
+}
+
+.ges-btn-primary:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(79,70,229,0.40);
+}
+
+.ges-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 7px rgba(79,70,229,0.24);
+}
+
+/* セカンダリボタン: アウトライン（主経路と明確に差別化） */
+.ges-btn-secondary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: transparent;
+    color: #6366f1;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1.5px solid rgba(99,102,241,0.4);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    font-family: inherit;
+}
+
+.ges-btn-secondary:hover {
+    background: rgba(99,102,241,0.07);
+    border-color: #6366f1;
+    transform: translateY(-1px);
+}
+
+/* ゴーストゾーン表示制御はJSで行う（app.js: updateChartContainerVisibility） */
+
+/* ========================================
+   頻度作業 空状態 水平バー (Frequency Empty State)
+   ─────────────────────────────────────
+   認知心理学の適用:
+   ・コンテキスト感知型UX : ガントデータ有無でヒント文を切り替え
+   ・視覚的重要度の序列  : ガントカードより低い存在感（高さ・彩度を抑制）
+   ・アクション誘引       : 右端のボタンで Gestalt の図と地を活用
+   配色: Purple系（ガントの Indigo と区別、既存 frequency-ghost と継承）
+======================================== */
+
+/* ========================================
+   頻度作業 空状態オンボーディングカード (Frequency Empty State)
+   ─────────────────────────────────────
+   認知心理学の適用:
+   ・ガント空状態カードと同一の視覚文法（一貫性の法則）
+   ・コンテキスト感知型: ガントデータ未入力時は警告ヒントを表示
+   ・アクション1本化: 頻度作業は目的がシンプルなためCTAを1つに絞る
+   配色: Purple系（ガントの Indigo と明確に区別）
+======================================== */
+
+#frequencyChartContainer .frequency-empty-state {
+    margin: 6px 0;
+}
+
+.frequency-empty-state {
+    border-radius: 10px;
+    border: 1.5px dashed rgba(124, 58, 237, 0.35);
+    background: linear-gradient(145deg, #fdf8ff 0%, #f3e8ff 100%);
+    position: relative;
+    width: calc(100% - 2px);
+    min-width: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    cursor: default;
+    animation: fes-border-pulse 3s ease-in-out infinite;
+}
+
+@keyframes fes-border-pulse {
+    0%, 100% { border-color: rgba(124, 58, 237, 0.28); }
+    50%       { border-color: rgba(124, 58, 237, 0.58); }
+}
+
+/* 左端 Purple アクセントバー */
+.frequency-empty-state::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #7c3aed 0%, #a78bfa 100%);
+    border-radius: 9px 0 0 9px;
+}
+
+/* 縦積みレイアウト（ガントカードと同一パターン） */
+.fes-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 24px 22px;
+    gap: 14px;
+}
+
+/* アイコンリング */
+.fes-icon-ring {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(167,139,250,0.18) 100%);
+    border: 1.5px solid rgba(124, 58, 237, 0.28);
+    box-shadow: 0 0 0 7px rgba(124,58,237,0.05), 0 0 0 13px rgba(124,58,237,0.02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7c3aed;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* テキストブロック */
+.fes-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-align: center;
+}
+
+.fes-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2e1065;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.fes-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* コンテキスト感知ヒント
+   ガントデータなし → 警告色で「先に標準作業を登録」と表示
+   ガントデータあり → 非表示（通常フロー）                      */
+.fes-context-hint {
+    font-size: 11px;
+    font-weight: 600;
+    margin: 2px 0 0;
+    padding: 4px 10px;
+    border-radius: 12px;
+    display: none; /* JS で内容を入れたとき表示 */
+    line-height: 1.4;
+}
+
+.fes-context-hint:not(:empty) {
+    display: inline-block;
+}
+
+/* ガントデータなし時: Amber 警告色 */
+.fes-context-hint.hint-warning {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fcd34d;
+}
+
+/* ガントデータあり時: 表示しない（クラスなし） */
+
+/* アクションエリア */
+.fes-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* プライマリボタン（Purple） */
+.fes-btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 22px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    box-shadow: 0 2px 10px rgba(124,58,237,0.30);
+    font-family: inherit;
+    letter-spacing: 0.01em;
+}
+
+.fes-btn-primary:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 16px rgba(124,58,237,0.40);
+}
+
+.fes-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 7px rgba(124,58,237,0.24);
+}
+
+/* ========================================
+   工程確認チャート 空状態 情報バー (Process Empty State)
+   ─────────────────────────────────────
+   認知心理学の適用:
+   ・インフォーマティブ型（操作を求めない情報提示）
+     工程チャートはガントデータから自動生成のため、
+     ユーザーへのアクション要求ではなく状態説明にとどめる
+   ・低い視覚重要度: Teal系（穏やかな情報色）でシステム状態を表現
+   配色: Teal系（Emerald/Green と差別化）
+======================================== */
+
+.process-empty-state {
+    margin: 6px 0;
+    border-radius: 7px;
+    border: 1px dashed rgba(13, 148, 136, 0.28);
+    background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #f0fdfa 100%);
+    width: calc(100% - 2px);
+    min-width: 300px;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 左端 Teal アクセントバー */
+.process-empty-state::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: #0d9488;
+    border-radius: 6px 0 0 6px;
+}
+
+.pes-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px 12px 20px;
+}
+
+.pes-icon {
+    color: #0d9488;
+    font-size: 14px;
+    flex-shrink: 0;
+    opacity: 0.85;
+}
+
+.pes-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: #134e4a;
+    white-space: nowrap;
+}
+
+/* セパレータ */
+.pes-divider {
+    display: inline-block;
+    width: 1px;
+    height: 13px;
+    background: rgba(13,148,136,0.28);
+    flex-shrink: 0;
+}
+
+.pes-hint {
+    font-size: 11px;
+    color: #0f766e;
+    opacity: 0.82;
+    line-height: 1.4;
+}
+
+/* ========================================
+   WIP不一致 アラート系スタイル
+   工程確認チャートオーバーレイ + モーダルバナー
+======================================== */
+
+/* ── 工程確認チャート：オーバーレイバッジ ─── */
+.process-chart-wip-alert {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px 5px 8px;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border: 1.5px solid #f97316;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    animation: wipAlertPulse 2.5s ease-in-out infinite;
+}
+
+.process-chart-wip-alert:hover {
+    background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+    border-color: #ea580c;
+    box-shadow: 0 3px 12px rgba(249, 115, 22, 0.35);
+}
+
+@keyframes wipAlertPulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25); }
+    50%       { box-shadow: 0 2px 14px rgba(249, 115, 22, 0.50); }
+}
+
+.process-wip-alert-icon {
+    font-size: 12px;
+    color: #ea580c;
+    flex-shrink: 0;
+}
+
+.process-wip-alert-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9a3412;
+    letter-spacing: 0.02em;
+}
+
+.process-wip-alert-btn {
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    background: #ea580c;
+    border: none;
+    border-radius: 10px;
+    padding: 2px 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.process-wip-alert-btn:hover {
+    background: #c2410c;
+}
+
+/* chart-container を基準に absolute 配置できるよう position:relative 保証 */
+#processChartContainer {
+    position: relative;
+}
+
+/* ── モーダル内：WIP不一致バナー ─── */
+.modal-wip-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 16px 0 16px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1.5px solid #f59e0b;
+    border-radius: 8px;
+    /* 上のシートスイッチャー or ヘッダーとの間隔 */
+    margin-top: 10px;
+    margin-bottom: 0;
+    /* 認知設計: 警告色は黄〜橙。赤は「エラー・操作不能」と混同しないよう区別 */
+}
+
+.modal-wip-banner-icon {
+    font-size: 16px;
+    color: #d97706;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.modal-wip-banner-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.modal-wip-banner-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #92400e;
+    margin: 0 0 2px 0;
+    line-height: 1.3;
+}
+
+.modal-wip-banner-desc {
+    font-size: 11px;
+    color: #78350f;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.modal-wip-banner-btn {
+    flex-shrink: 0;
+    align-self: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: #d97706;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.modal-wip-banner-btn:hover {
+    background: #b45309;
+    transform: translateY(-1px);
+}
+
+.modal-wip-banner-btn:active {
+    transform: translateY(0);
+}
+
+/* 標準手持ち入力欄フォーカス誘導ハイライト */
+@keyframes wipInputHighlight {
+    0%   { box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.6); border-color: #f97316; }
+    50%  { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.3); border-color: #ea580c; }
+    100% { box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.0); border-color: inherit; }
+}
+.wip-input-highlight {
+    animation: wipInputHighlight 2s ease-out forwards;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   自動送り干渉バッジ（標準作業組合せ票オーバーレイ）
+   設計方針（認知心理学）:
+     ・赤系 + ⚠ アイコン → 前注意的特徴で即時リスク知覚
+     ・コンパクトサイズ → チャート情報の遮蔽を最小化
+     ・カーソル: grab → ドラッグ可能であることを直感的に伝達
+     ・pulse アニメーション → 静的なUIに埋もれない注意誘引
+     ・閉じるボタン → ユーザーのコントロール感を担保
+════════════════════════════════════════════════════════════════════ */
+
+.gantt-autofeed-conflict-badge {
+    /* 絶対配置: canvas-container を基準、位置は JS で制御（スクロール追従） */
+    position: absolute;
+    z-index: 30;
+
+    /* レイアウト */
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 7px 8px 7px 10px;
+    min-width: 160px;
+    max-width: 280px;
+
+    /* ビジュアル */
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1.5px solid #fca5a5;
+    border-left: 3px solid #dc2626;
+    border-radius: 8px;
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.18), 0 1px 3px rgba(0,0,0,0.08);
+
+    /* インタラクション */
+    cursor: grab;
+    user-select: none;
+
+    /* 注意誘引アニメーション */
+    animation: gafcPulse 3s ease-in-out infinite;
+}
+
+.gantt-autofeed-conflict-badge:active {
+    cursor: grabbing;
+}
+
+@keyframes gafcPulse {
+    0%,  100% { box-shadow: 0 3px 10px rgba(220, 38, 38, 0.18), 0 1px 3px rgba(0,0,0,0.08); }
+    50%        { box-shadow: 0 3px 16px rgba(220, 38, 38, 0.38), 0 1px 4px rgba(0,0,0,0.10); }
+}
+
+/* ドラッグ中はアニメーションを止めて影を強調（グラブ操作のフィードバック） */
+.gantt-autofeed-conflict-badge:active {
+    animation: none;
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.30), 0 2px 6px rgba(0,0,0,0.12);
+    transform: scale(1.01);
+}
+
+/* ⚠ アイコン */
+.gafc-icon {
+    font-size: 12px;
+    color: #dc2626;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* テキスト本体 */
+.gafc-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* ヘッドライン（ひと目で状況を把握 → 情報の頂点） */
+.gafc-headline {
+    font-size: 11px;
+    font-weight: 700;
+    color: #991b1b;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    line-height: 1.3;
+}
+
+/* 明細エリア（折り畳み表示で認知負荷を下げる） */
+.gafc-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.gafc-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: #7f1d1d;
+    line-height: 1.4;
+    flex-wrap: wrap;
+}
+
+.gafc-detail-row strong {
+    font-weight: 700;
+    color: #b91c1c;
+}
+
+/* モードタグ（改善前・改善後を色で区別 → 図と地の分離） */
+.gafc-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+}
+
+.gafc-tag--current {
+    background: #1f29370f;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.gafc-tag--improved {
+    background: #dc26260f;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+}
+
+/* 閉じるボタン（ユーザーコントロール感の担保） */
+.gafc-close {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid #fca5a5;
+    border-radius: 3px;
+    color: #dc2626;
+    font-size: 9px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    margin-top: 1px;
+    padding: 0;
+}
+
+.gafc-close:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+}

@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>標準作業組合せ票</title>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/legend.css">
+    <link rel="stylesheet" href="css/sort-modal.css">
+    <link rel="stylesheet" href="css/group.css">
+    <link rel="stylesheet" href="css/multi-gantt.css">
+    <style>
+        /* =========================================
+           KPI グループ：左セパレータ（border-left）を削除
+        ========================================= */
+        .settings-kpi-group {
+            border-left: none !important;
+            padding-left: 0 !important;
+        }
+
+        /* =========================================
+           頻度作業ピルトグルボタン + 時間表示エリア
+           認知心理学:
+             ・Stateful Button Pattern: ボタンテキスト自体が現在状態を示す
+             ・段階的開示: デフォルトOFF → ボタン1タップで詳細開示
+             ・affordance: pill形状 + hover変化でクリック可能と知覚させる
+        ========================================= */
+
+        /* 全体コンテナ: CT行の直下に縦積み */
+        .freq-ct-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 2px;
+        }
+
+        /* ON時: 頻度込みC/T値行（メインCTと同サイズ） */
+        .freq-ct-value-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 頻度込みC/T 数値 — メインCT(17px/700)と完全に揃える */
+        .freq-included-time-large {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--success-color);
+            font-family: 'Consolas', 'Monaco', monospace;
+            letter-spacing: -0.025em;
+            transition: color 0.25s ease;
+        }
+        .freq-included-time-large.over-takt {
+            color: #dc2626;
+        }
+
+        /* 差分テキスト (+Xs) */
+        .freq-included-delta-sm {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            font-family: 'Consolas', 'Monaco', monospace;
+            opacity: 0.85;
+        }
+
+        /* ピルトグルボタン本体 */
+        .freq-pill-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 8px 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px dashed #cbd5e1;
+            background: transparent;
+            color: #94a3b8;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+            align-self: flex-start;
+            line-height: 1.4;
+            font-family: inherit;
+            outline: none;
+            user-select: none;
+        }
+        .freq-pill-btn i {
+            font-size: 8px;
+            transition: transform 0.18s ease;
+        }
+        /* OFF時ホバー: インジゴ予告 */
+        .freq-pill-btn:hover {
+            border-color: #6366f1;
+            border-style: solid;
+            color: #4f46e5;
+            background: rgba(99,102,241,0.07);
+        }
+        .freq-pill-btn:hover i { transform: rotate(90deg); }
+
+        /* ON状態 */
+        .freq-pill-btn.active {
+            border-style: solid;
+            border-color: rgba(5,150,105,0.5);
+            background: rgba(5,150,105,0.09);
+            color: #059669;
+        }
+        /* ON時ホバー: 「クリックで解除」の予告 (赤系) */
+        .freq-pill-btn.active:hover {
+            border-color: rgba(220,38,38,0.45);
+            background: rgba(220,38,38,0.07);
+            color: #dc2626;
+        }
+        .freq-pill-btn.active:hover i { transform: rotate(0deg); }
+
+        /* T/T超過時: 常時警告色 */
+        .freq-pill-btn.over-takt {
+            border-style: solid;
+            border-color: rgba(220,38,38,0.45);
+            background: rgba(220,38,38,0.07);
+            color: #dc2626;
+            animation: freqBtnPulse 1.8s ease-in-out infinite;
+        }
+        @keyframes freqBtnPulse {
+            0%, 100% { box-shadow: none; }
+            50% { box-shadow: 0 0 0 2px rgba(220,38,38,0.15); }
+        }
+
+        /* =========================================
+           文字位置調整 – キャンバスフラッシュオーバーレイ
+        ========================================= */
+        .text-pos-flash-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: 4px;
+            z-index: 20;
+            animation: textPosFlash 2s ease-out forwards;
+        }
+        .text-pos-flash-overlay.flash-sub {
+            animation: textPosFlashSub 2s ease-out forwards;
+        }
+        @keyframes textPosFlash {
+            0%   { background: rgba(99,102,241,0.0);  box-shadow: none; }
+            18%  { background: rgba(99,102,241,0.20); box-shadow: inset 0 0 0 2px rgba(99,102,241,0.65); }
+            40%  { background: rgba(99,102,241,0.04); box-shadow: inset 0 0 0 2px rgba(99,102,241,0.15); }
+            60%  { background: rgba(99,102,241,0.15); box-shadow: inset 0 0 0 2px rgba(99,102,241,0.50); }
+            80%  { background: rgba(99,102,241,0.03); box-shadow: inset 0 0 0 2px rgba(99,102,241,0.10); }
+            100% { background: rgba(99,102,241,0.0);  box-shadow: none; }
+        }
+        @keyframes textPosFlashSub {
+            0%   { background: rgba(245,158,11,0.0);  box-shadow: none; }
+            15%  { background: rgba(245,158,11,0.22); box-shadow: inset 0 0 0 2px rgba(245,158,11,0.70); }
+            35%  { background: rgba(245,158,11,0.05); box-shadow: inset 0 0 0 2px rgba(245,158,11,0.20); }
+            55%  { background: rgba(245,158,11,0.18); box-shadow: inset 0 0 0 2px rgba(245,158,11,0.55); }
+            75%  { background: rgba(245,158,11,0.03); box-shadow: inset 0 0 0 2px rgba(245,158,11,0.10); }
+            100% { background: rgba(245,158,11,0.0);  box-shadow: none; }
+        }
+
+        /* =========================================
+           文字位置調整パネル – サブアイテムヘッダーのテキストフラッシュ
+           認知心理学（変化検出）: テキスト自体が太字 + アンバーに変化することで
+           「今展開したメニュー = このテキスト文字が対象」と即座に紐づける
+        ========================================= */
+        .text-pos-item-flash-target {
+            animation: textItemBoldPulse 1.6s ease-out forwards;
+            display: inline-block;
+        }
+        @keyframes textItemBoldPulse {
+            0%   { color: inherit;  font-weight: 600; }
+            12%  { color: #f59e0b;  font-weight: 800; text-shadow: 0 0 8px rgba(245,158,11,0.45); }
+            28%  { color: inherit;  font-weight: 600; text-shadow: none; }
+            48%  { color: #f59e0b;  font-weight: 800; text-shadow: 0 0 6px rgba(245,158,11,0.35); }
+            68%  { color: inherit;  font-weight: 600; text-shadow: none; }
+            100% { color: inherit;  font-weight: 600; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ドラッグアンドドロップオーバーレイ -->
+    <div class="drag-drop-overlay" id="dragDropOverlay" style="display: none;">
+        <div class="drag-drop-content">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h2>CSVファイルをドロップしてください</h2>
+            <p>作業項目データを含むCSVファイルをここにドロップして読み込みます</p>
+        </div>
+    </div>
+
+    <!-- ヘッダーエリア -->
+    <div class="app-header">
+        <div class="header-content">
+            <!-- メインタブ切り替え -->
+            <div class="main-tab-navigation">
+                <button class="main-tab-button active" id="ganttTab" onclick="switchMainTab('gantt')">
+                    <i class="fas fa-chart-gantt"></i>標準作業組合せ票
+                </button>
+                <button class="main-tab-button" id="distributionTab" onclick="switchMainTab('distribution')">
+                    <i class="fas fa-chart-bar"></i>作業配分表
+                </button>
+                <button class="main-tab-button" id="multiGanttTab" onclick="switchMainTab('multiGantt')">
+                    <i class="fas fa-users"></i>比較ガント
+                </button>
+                <button class="main-tab-button" id="scheduleTab" onclick="switchMainTab('schedule')">
+                    <i class="fas fa-clock"></i>稼働時間
+                </button>
+            </div>
+            <!-- ファイル管理UI（右上） -->
+            <div class="data-list-section" style="position:relative;">
+                <select id="dataListSelect" style="display:none" onchange="loadDataFromList()"><option value="">新規データ</option></select>
+                <button id="deleteDataFromListBtn" style="display:none;"></button>
+                <div class="current-file-display" id="currentFileDisplay" onclick="toggleFileManagerPanel()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' ')toggleFileManagerPanel()">
+                    <i class="fas fa-file" id="currentFileIcon"></i>
+                    <div class="current-file-text">
+                        <span class="current-file-name" id="currentFileName">新規データ</span>
+                        <span class="current-file-meta" id="currentFileCount">データなし</span>
+                    </div>
+                    <i class="fas fa-chevron-down current-file-chevron" id="fileManagerChevron"></i>
+                </div>
+                <button class="btn btn-save-main" id="saveDataToListBtn" onclick="saveCurrentDataToList()" title="保存 (Ctrl+S)">
+                    <i class="fas fa-save"></i><span>保存</span>
+                </button>
+                <!-- ファイル管理パネル（ドロップダウン） -->
+                <div class="file-manager-panel" id="fileManagerPanel" style="display:none;" role="dialog" aria-label="ファイル管理">
+                    <div class="fmp-header">
+                        <span class="fmp-title"><i class="fas fa-folder-open"></i> ファイル管理</span>
+                        <button class="fmp-close-btn" onclick="closeFileManagerPanel()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="fmp-section">
+                        <div class="fmp-section-label">現在のデータ</div>
+                        <div class="fmp-current-info">
+                            <i class="fas fa-file fmp-current-icon" id="fmpCurrentIcon"></i>
+                            <div class="fmp-current-details">
+                                <div class="fmp-current-name" id="fmpCurrentName">新規データ</div>
+                                <div class="fmp-current-meta" id="fmpCurrentMeta">データなし</div>
+                            </div>
+                        </div>
+                        <div class="fmp-action-row">
+                            <button class="btn fmp-btn-save" onclick="saveCurrentDataToList()"><i class="fas fa-save"></i><span id="fmpSaveBtnLabel">上書き保存</span></button>
+                            <button class="btn fmp-btn-saveas" onclick="saveDataAs()"><i class="fas fa-copy"></i>別名で保存</button>
+                        </div>
+                    </div>
+                    <div class="fmp-list-header">
+                        <span class="fmp-section-label">保存済み一覧</span>
+                        <span class="fmp-count" id="fmpCount">0件</span>
+                    </div>
+                    <div class="fmp-list" id="fileManagerListContainer">
+                        <div class="fmp-empty"><i class="fas fa-inbox"></i><br>保存済みデータはありません</div>
+                    </div>
+                    <div class="fmp-transfer-section">
+                        <div class="fmp-section-label">データ転送</div>
+                        <div class="fmp-transfer-group">
+                            <div class="fmp-transfer-group-label"><i class="fas fa-file-export"></i> 書き出し（JSON）</div>
+                            <div class="fmp-transfer-buttons">
+                                <button class="btn fmp-btn-export-single" onclick="exportData();closeFileManagerPanel();" title="現在の1件をJSONで書き出し"><i class="fas fa-file-alt"></i><span>現在の1件</span></button>
+                                <button class="btn fmp-btn-export-all" onclick="exportAllData();closeFileManagerPanel();" title="全件バックアップ"><i class="fas fa-layer-group"></i><span>全件バックアップ</span></button>
+                            </div>
+                        </div>
+                        <div class="fmp-transfer-group">
+                            <div class="fmp-transfer-group-label"><i class="fas fa-file-import"></i> 読み込み（JSON）</div>
+                            <div class="fmp-transfer-buttons">
+                                <button class="btn fmp-btn-import-replace" onclick="importData();closeFileManagerPanel();" title="現在を置き換え"><i class="fas fa-exchange-alt"></i><span>現在を置き換え</span></button>
+                                <button class="btn fmp-btn-import-add" onclick="importAddToList();closeFileManagerPanel();" title="一覧に追加"><i class="fas fa-plus-circle"></i><span>一覧に追加</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- メイン: 基本設定エリア + ガントチャート / 作業配分表 / 稼働時間 -->
+        <!-- コントロールパネル（左） -->
+        <div class="control-panel">
+
+            <!-- ======================= -->
+            <!--   タブ依存セクション   -->
+            <!-- ======================= -->
+
+            <!-- ガントチャート用コントロール -->
+            <div id="ganttPanelControls">
+
+                <!-- パネル内サブタブナビ -->
+                <div class="panel-sub-nav">
+                    <button class="panel-sub-tab active" onclick="switchPanelTab('gantt', 'View', this)">
+                        <i class="fas fa-eye"></i>チャート表示
+                    </button>
+                    <button class="panel-sub-tab" onclick="switchPanelTab('gantt', 'Edit', this)">
+                        <i class="fas fa-pen-to-square"></i>チャート編集
+                    </button>
+                </div>
+
+                <!-- ── チャート表示タブ ── -->
+                <div class="panel-sub-content active" id="ganttViewPanel">
+
+                    <!-- チャートの表示 / 非表示 -->
+                    <div class="data-category" id="displaySettingsSection">
+                        <div class="category-header active" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-tv"></i>
+                                <span>チャートの表示 / 非表示</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content active">
+                            <div class="category-content-wrapper">
+                                <div class="display-toggles-container">
+                                    <!-- 工程確認チャート トグル -->
+                                    <div class="display-toggle-row">
+                                        <label for="showProcessChart" class="display-toggle-label">
+                                            <i class="fas fa-project-diagram"></i>
+                                            <span>工程確認チャート</span>
+                                        </label>
+                                        <label class="slide-switch">
+                                            <input type="checkbox" id="showProcessChart" onchange="toggleProcessChart()">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </div>
+                                    <!-- 標準作業組合せ票 -->
+                                    <div class="gantt-toggle-group">
+                                        <div class="display-toggle-row">
+                                            <label for="showGanttChart" class="display-toggle-label">
+                                                <i class="fas fa-chart-gantt"></i>
+                                                <span>標準作業組合せ票</span>
+                                            </label>
+                                            <label class="slide-switch">
+                                                <input type="checkbox" id="showGanttChart" checked onchange="toggleGanttChart()">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div id="ganttChartOptionsContainer" class="gantt-chart-options visible"></div>
+                                    </div>
+                                    <!-- 頻度作業チャート -->
+                                    <div class="gantt-toggle-group">
+                                        <div class="display-toggle-row">
+                                            <label for="showFrequencyChart" class="display-toggle-label">
+                                                <i class="fas fa-redo-alt"></i>
+                                                <span>頻度作業チャート</span>
+                                            </label>
+                                            <label class="slide-switch">
+                                                <input type="checkbox" id="showFrequencyChart" checked onchange="toggleFrequencyChart()">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                        <div id="freqTimeModeContainer" class="gantt-chart-options">
+                                            <!-- 実時間/換算値ボタンは頻度作業チャート上のオーバーレイに移動 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 2サイクル設定 -->
+                    <div class="data-category" id="dualCycleSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-layer-group"></i>
+                                <span>サイクル描画設定</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span id="cycleCountBadge" style="display:none;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;letter-spacing:0.03em;"></span>
+                                <i class="fas fa-chevron-down category-toggle"></i>
+                            </div>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+
+                                <!-- マルチサイクルON/OFFトグル -->
+                                <div class="display-toggle-row">
+                                    <label for="multiCycleToggle" class="display-toggle-label">
+                                        <i class="fas fa-layer-group" style="color:#6366f1;"></i>
+                                        <span>マルチサイクル表示</span>
+                                    </label>
+                                    <label class="slide-switch">
+                                        <input type="checkbox" id="multiCycleToggle"
+                                               onchange="updateDualCycleSettings()">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- サイクル数ステッパー（ON時のみ表示） -->
+                                <div id="cycleCountContainer" style="display:none; margin-top:10px;">
+                                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:8px 12px;">
+                                        <label style="font-size:12px;font-weight:600;color:#3730a3;flex-shrink:0;">
+                                            <i class="fas fa-hashtag" style="margin-right:4px;opacity:0.7;"></i>サイクル数
+                                        </label>
+                                        <div style="display:flex;align-items:center;gap:6px;">
+                                            <button type="button"
+                                                style="width:28px;height:28px;border:1px solid #c7d2fe;border-radius:6px;background:#fff;color:#4f46e5;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;"
+                                                onmousedown="this.style.background='#e0e7ff'"
+                                                onmouseup="this.style.background='#fff'"
+                                                onmouseleave="this.style.background='#fff'"
+                                                onclick="(function(){const el=document.getElementById('cycleCountInput');if(el&&parseInt(el.value)>2){el.value=parseInt(el.value)-1;onCycleCountInputChange();}})()">−</button>
+                                            <input type="number" id="cycleCountInput"
+                                                min="2" max="10" value="2"
+                                                style="width:44px;text-align:center;font-size:15px;font-weight:700;color:#3730a3;border:1px solid #c7d2fe;border-radius:6px;padding:3px 4px;background:#fff;"
+                                                onchange="onCycleCountInputChange()"
+                                                oninput="this.value=Math.min(10,Math.max(2,parseInt(this.value)||2))">
+                                            <button type="button"
+                                                style="width:28px;height:28px;border:1px solid #c7d2fe;border-radius:6px;background:#fff;color:#4f46e5;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;"
+                                                onmousedown="this.style.background='#e0e7ff'"
+                                                onmouseup="this.style.background='#fff'"
+                                                onmouseleave="this.style.background='#fff'"
+                                                onclick="(function(){const el=document.getElementById('cycleCountInput');if(el&&parseInt(el.value)<10){el.value=parseInt(el.value)+1;onCycleCountInputChange();}})()">＋</button>
+                                        </div>
+                                    </div>
+                                    <!-- クイック選択ボタン -->
+                                    <div style="display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;">
+                                        <span style="font-size:10px;color:#64748b;align-self:center;margin-right:2px;">クイック選択:</span>
+                                        <button type="button" class="cycle-quick-btn" onclick="setCycleCount(2)" style="padding:3px 9px;border-radius:12px;border:1px solid #c7d2fe;background:#f0f9ff;color:#1d4ed8;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f9ff'">2</button>
+                                        <button type="button" class="cycle-quick-btn" onclick="setCycleCount(3)" style="padding:3px 9px;border-radius:12px;border:1px solid #c7d2fe;background:#f0f9ff;color:#1d4ed8;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f9ff'">3</button>
+                                        <button type="button" class="cycle-quick-btn" onclick="setCycleCount(4)" style="padding:3px 9px;border-radius:12px;border:1px solid #c7d2fe;background:#f0f9ff;color:#1d4ed8;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f9ff'">4</button>
+                                        <button type="button" class="cycle-quick-btn" onclick="setCycleCount(5)" style="padding:3px 9px;border-radius:12px;border:1px solid #c7d2fe;background:#f0f9ff;color:#1d4ed8;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#f0f9ff'">5</button>
+                                    </div>
+                                </div>
+
+                                <p style="font-size:11px; color:#64748b; margin-top:10px; line-height:1.6;">
+                                    複数サイクル連続表示により、自動送り時間と次サイクル作業との
+                                    干渉確認や、周期的なパターン把握が直感的にできます。
+                                    工程確認チャート・標準作業組合せ票が対象です。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 線スタイル設定 -->
+                    <div class="data-category" id="lineStyleSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-pen-ruler"></i>
+                                <span>線スタイル設定</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+
+                                <!-- 各行：[スウォッチ] [プレビューCanvas] [✏編集] -->
+                                <div class="ls-list">
+
+                                    <!-- T/T線 -->
+                                    <div class="ls-item" id="ls-item-taktTime">
+                                        <span class="ls-item-label">T/T</span>
+                                        <div class="ls-item-swatch-wrap">
+                                            <span class="ls-item-swatch" id="ls-row-swatch-taktTime" style="background:#dc2626;"></span>
+                                        </div>
+                                        <div class="ls-item-preview-wrap">
+                                            <canvas class="ls-preview-canvas" id="ls-preview-taktTime"></canvas>
+                                        </div>
+                                        <button class="ls-item-edit-btn" title="T/T線のスタイルを編集"
+                                            onclick="openLineStylePopup('taktTime', this)">
+                                            <i class="fas fa-sliders"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- 改善前C/T線 -->
+                                    <div class="ls-item" id="ls-item-currentCT">
+                                        <span class="ls-item-label">C/T前</span>
+                                        <div class="ls-item-swatch-wrap">
+                                            <span class="ls-item-swatch" id="ls-row-swatch-currentCT" style="background:#1f2937;"></span>
+                                        </div>
+                                        <div class="ls-item-preview-wrap">
+                                            <canvas class="ls-preview-canvas" id="ls-preview-currentCT"></canvas>
+                                        </div>
+                                        <button class="ls-item-edit-btn" title="改善前C/T線のスタイルを編集"
+                                            onclick="openLineStylePopup('currentCT', this)">
+                                            <i class="fas fa-sliders"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- 改善後C/T線 -->
+                                    <div class="ls-item" id="ls-item-improvedCT">
+                                        <span class="ls-item-label">C/T後</span>
+                                        <div class="ls-item-swatch-wrap">
+                                            <span class="ls-item-swatch" id="ls-row-swatch-improvedCT" style="background:#dc2626;"></span>
+                                        </div>
+                                        <div class="ls-item-preview-wrap">
+                                            <canvas class="ls-preview-canvas" id="ls-preview-improvedCT"></canvas>
+                                        </div>
+                                        <button class="ls-item-edit-btn" title="改善後C/T線のスタイルを編集"
+                                            onclick="openLineStylePopup('improvedCT', this)">
+                                            <i class="fas fa-sliders"></i>
+                                        </button>
+                                    </div>
+
+                                </div><!-- /ls-list -->
+
+                                <!-- 全リセット -->
+                                <button class="ls-reset-all-btn" onclick="resetLineStyles()" title="3線すべてデフォルトに戻す">
+                                    <i class="fas fa-rotate-left"></i>すべてリセット
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                                        <!-- スケール設定 -->
+                    <div class="data-category" id="scaleModeSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-ruler-combined"></i>
+                                <span>スケール設定</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <div class="scale-mode-buttons">
+                                    <div class="slider-control-group" id="manualScaleGroup">
+                                        <div class="slider-labels">
+                                            <label for="scaleSlider"><i class="fas fa-sliders-h"></i> 手動調整</label>
+                                            <span id="scaleValueDisplay">36s</span>
+                                        </div>
+                                        <input type="range" id="scaleSlider" class="scale-slider" min="10" max="300" value="36">
+                                        <!-- 2サイクル表示時のスケール制約インジケーター -->
+                                        <div class="scale-constraint-info" id="scaleConstraintInfo" style="display:none;" title="マルチサイクル表示中は、Nサイクル分の時間が最小スケールとなります">
+                                            <i class="fas fa-compress-alt"></i>
+                                            <span>最小: <strong id="scaleMinConstraintLabel">-</strong></span>
+                                            <span class="scale-constraint-reason">（Nサイクル制約）</span>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-scale-mode" id="mainScaleBtn" onclick="switchChartScale('main')">
+                                        <i class="fas fa-tasks"></i>標準作業基準
+                                    </button>
+                                    <button class="btn btn-scale-mode" id="frequencyScaleBtn" onclick="switchChartScale('frequency')">
+                                        <i class="fas fa-redo-alt"></i>頻度作業基準
+                                    </button>
+                                </div>
+                            </div>    
+                        </div>
+                    </div>
+
+                    <!-- 表示レイアウト設定 -->
+                    <div class="data-category" id="layoutSettingsSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-compress-arrows-alt"></i>
+                                <span>表示レイアウト</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper" style="padding-bottom: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                    <div style="font-size: 11px; color: var(--text-secondary); width: 55px; flex-shrink: 0; white-space: nowrap;">行の高さ</div>
+                                    <input type="range" id="rowHeightSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="updateLayoutSettings()" style="flex: 1; accent-color: var(--primary-color);">
+                                    <span id="rowHeightValue" style="font-size: 11px; width: 30px; text-align: right; font-family: monospace; flex-shrink: 0;">1.0x</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                                    <div style="font-size: 11px; color: var(--text-secondary); width: 55px; flex-shrink: 0; white-space: nowrap;">文字サイズ</div>
+                                    <input type="range" id="fontSizeSlider" min="0.5" max="2.5" step="0.1" value="1.0" oninput="updateLayoutSettings()" style="flex: 1; accent-color: var(--primary-color);">
+                                    <span id="fontSizeValue" style="font-size: 11px; width: 30px; text-align: right; font-family: monospace; flex-shrink: 0;">1.0x</span>
+                                </div>
+                                <button class="btn btn-secondary btn-small" onclick="resetLayoutSettings()" style="width: 100%;">
+                                    <i class="fas fa-undo"></i> 標準に戻す
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 凡例 -->
+                    <div class="data-category" id="legendSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-palette"></i>
+                                <span>凡例</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <div class="legend-items">
+                                    <div class="legend-item"><div class="legend-line legend-manual"></div>実作業（手作業）</div>
+                                    <div class="legend-item"><div class="legend-line legend-auto"></div>自動送り（機械動作）</div>
+                                    <div class="legend-item"><div class="legend-line legend-walk"></div>歩行時間</div>
+                                    <div class="legend-item"><div class="legend-line legend-monitor"></div>監視作業</div>
+                                    <div class="legend-item"><div class="legend-line legend-hold"></div>保持作業</div>
+                                    <div class="legend-item"><svg class="legend-wait-svg" viewBox="0 0 36 10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polygon points="0,5 7,1 7,9" fill="white" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><line x1="7" y1="3.5" x2="29" y2="3.5" stroke="currentColor" stroke-width="1.5"/><line x1="7" y1="6.5" x2="29" y2="6.5" stroke="currentColor" stroke-width="1.5"/><polygon points="36,5 29,1 29,9" fill="white" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>手待ち時間</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ─── 画像出力 ─── -->
+                    <div class="data-category" id="screenshotSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-camera"></i>
+                                <span>画像出力</span>
+                            </div>
+                            <span id="screenshotTargetCount" class="info-badge">0件対象</span>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <!-- 対象チャートの状態インジケーター -->
+                                <div class="screenshot-panel-status">
+                                    <div class="screenshot-panel-status-item">
+                                        <i class="fas fa-project-diagram screenshot-panel-chart-icon"></i>
+                                        <span class="screenshot-panel-chart-name">工程管理</span>
+                                        <span class="screenshot-panel-badge screenshot-panel-badge--off" id="screenshotBadge_processCanvas">OFF</span>
+                                    </div>
+                                    <div class="screenshot-panel-status-item">
+                                        <i class="fas fa-chart-gantt screenshot-panel-chart-icon"></i>
+                                        <span class="screenshot-panel-chart-name">組合せ票</span>
+                                        <span class="screenshot-panel-badge screenshot-panel-badge--on" id="screenshotBadge_ganttCanvas">ON</span>
+                                    </div>
+                                    <div class="screenshot-panel-status-item">
+                                        <i class="fas fa-redo-alt screenshot-panel-chart-icon"></i>
+                                        <span class="screenshot-panel-chart-name">頻度作業</span>
+                                        <span class="screenshot-panel-badge screenshot-panel-badge--on" id="screenshotBadge_frequencyCanvas">ON</span>
+                                    </div>
+                                </div>
+                                <!-- 出力ボタン -->
+                                <div class="data-action-grid two-column" style="margin-top:8px;">
+                                    <button class="btn btn-screenshot-single" onclick="ScreenshotManager.exportSingle()" title="表示ONのチャートを1枚の画像で出力">
+                                        <i class="fas fa-image"></i>1枚で出力
+                                    </button>
+                                    <button class="btn btn-screenshot-split" onclick="ScreenshotManager.showSplitDialog()" title="表示ONのチャートを指定枚数に分割して出力">
+                                        <i class="fas fa-cut"></i>分割出力
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /ganttViewPanel -->
+
+                <!-- ── チャート編集タブ ── -->
+                <div class="panel-sub-content" id="ganttEditPanel">
+
+                    <!-- 作業の並び替え -->
+                    <div class="data-category" id="orderManagementSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-sort-amount-down"></i>
+                                <span>作業の並び替え</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <div class="data-action-grid two-column">
+                                    <button class="btn btn-reorder" onclick="manageWorkOrder('current')">
+                                        <i class="fas fa-tasks icon-current"></i>改善前並び替え
+                                    </button>
+                                    <button class="btn btn-reorder" onclick="manageWorkOrder('improved')">
+                                        <i class="fas fa-rocket icon-improved"></i>改善後並び替え
+                                    </button>
+                                </div>
+                                <div class="data-action-grid" style="margin-top: 6px;">
+                                    <button class="btn btn-reorder-align" onclick="alignImprovedOrder()">
+                                        <i class="fas fa-align-left"></i>改善後を改善前に揃える
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 頻度作業の管理 -->
+                    <div class="data-category" id="frequencyWorkSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-redo-alt"></i>
+                                <span>頻度作業の管理</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="frequency-work-list" id="frequencyWorkList"></div>
+                            <div class="frequency-work-stats" id="frequencyWorkStats">頻度作業なし</div>
+                            <div class="frequency-work-actions">
+                                <button class="btn btn-frequency-add" onclick="addFrequencyWork()">
+                                    <i class="fas fa-plus"></i>追加
+                                </button>
+                                <button class="btn btn-frequency-clear" id="clearFrequencyWorkBtn" onclick="clearAllFrequencyWork()">
+                                    <i class="fas fa-eraser"></i>全削除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 文字位置調整 -->
+                    <div class="data-category" id="textPositionAdjustmentSection">
+                        <div class="category-header" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-text-height"></i>
+                                <span>文字位置調整</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content" id="textPositionPanelContainer"></div>
+                    </div>
+
+                </div><!-- /ganttEditPanel -->
+
+            </div>
+            
+            <!-- 作業配分表用コントロール -->
+            <div id="distributionPanelControls" style="display: none;">
+                <h2 class="panel-title">作業配分設定</h2>
+                
+                <!-- 新規: レイアウト調整（棒グラフの幅・間隔） -->
+                <div class="data-category theme-distribution" id="distributionLayoutSection">
+                    <div class="category-header" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-arrows-alt-h"></i>
+                            <span>レイアウト調整</span>
+                        </div>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-content-wrapper" style="padding-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                                <div style="font-size: 11px; color: var(--text-secondary); width: 65px; flex-shrink: 0; white-space: nowrap;">棒の幅</div>
+                                <input type="range" id="distBarWidthSlider" min="20" max="200" step="5" value="100" oninput="updateDistributionLayoutSettings()" style="flex: 1; accent-color: var(--theme-distribution-icon, #f59e0b);">
+                                <span id="distBarWidthValue" style="font-size: 11px; width: 35px; text-align: right; font-family: monospace; flex-shrink: 0;">100px</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                                <div style="font-size: 11px; color: var(--text-secondary); width: 65px; flex-shrink: 0; white-space: nowrap;">間隔</div>
+                                <input type="range" id="distGroupSpacingSlider" min="10" max="150" step="5" value="40" oninput="updateDistributionLayoutSettings()" style="flex: 1; accent-color: var(--theme-distribution-icon, #f59e0b);">
+                                <span id="distGroupSpacingValue" style="font-size: 11px; width: 35px; text-align: right; font-family: monospace; flex-shrink: 0;">40px</span>
+                            </div>
+                            <button class="btn btn-secondary btn-small" onclick="resetDistributionLayoutSettings()" style="width: 100%;">
+                                <i class="fas fa-undo"></i> 標準に戻す
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-category theme-distribution" id="dataSelectionSection">
+                    <div class="category-header" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-tasks"></i>
+                            <span>配分データの選択</span>
+                        </div>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-content-wrapper">
+                            <div class="data-selection-list" id="dataSelectionList"></div>
+                            <div class="data-selection-actions">
+                                <button class="btn btn-secondary btn-small" onclick="selectAllData()"><i class="fas fa-check-square"></i>全選択</button>
+                                <button class="btn btn-secondary btn-small" onclick="clearAllSelections()"><i class="fas fa-square"></i>全解除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="data-category" id="variabilityEditorSection">
+                    <div class="category-header" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-chart-line"></i>
+                            <span>バラつきデータ編集</span>
+                        </div>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content" id="variabilityEditorContent">
+                        <div class="category-content-wrapper"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 稼働時間用コントロール -->
+            <div id="schedulePanelControls" style="display: none;">
+                <h2 class="panel-title">稼働時間設定</h2>
+                <div class="data-category" id="timeSlotManagementSection">
+                    <div class="category-header" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>時間帯管理</span>
+                        </div>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-content-wrapper">
+                            <div class="time-slot-list" id="timeSlotList"></div>
+                            <div class="time-slot-actions">
+                                <button class="btn btn-primary btn-small" onclick="addTimeSlot()"><i class="fas fa-plus"></i>追加</button>
+                                <button class="btn btn-secondary btn-small" onclick="clearAllTimeSlots()"><i class="fas fa-eraser"></i>全削除</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 比較ガント用コントロール -->
+            <div id="multiGanttPanelControls" style="display: none;">
+
+                <!-- 表示モード切替 -->
+                <p class="panel-title theme-display">表示モード</p>
+                <div class="data-category theme-display">
+                    <div class="category-header active" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-toggle-on"></i>
+                            <span>改善前 / 後 切替</span>
+                        </div>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content active">
+                        <div class="category-content-wrapper">
+                            <div class="mg-mode-buttons">
+                                <button class="mg-mode-btn active" data-mode="current"
+                                        onclick="mgSetDisplayMode('current')">
+                                    <i class="fas fa-tasks"></i>改善前
+                                </button>
+                                <button class="mg-mode-btn" data-mode="improved"
+                                        onclick="mgSetDisplayMode('improved')">
+                                    <i class="fas fa-rocket"></i>改善後
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 作業者選択 -->
+                <p class="panel-title theme-display" style="margin-top:14px;">作業者選択</p>
+                <div class="data-category theme-display">
+                    <div class="category-header active" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-users"></i>
+                            <span>表示する作業者</span>
+                        </div>
+                        <span id="mgCountBadge" class="info-badge">0件選択</span>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content active">
+                        <div class="category-content-wrapper">
+                            <div class="data-selection-list" id="mgWorkerList">
+                                <div class="mg-empty-list">
+                                    <i class="fas fa-inbox"></i>
+                                    <span>データがありません</span>
+                                </div>
+                            </div>
+                            <div class="data-selection-actions">
+                                <button class="btn btn-secondary btn-small" onclick="mgSelectAll()">
+                                    <i class="fas fa-check-square"></i>全選択
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="mgClearAll()">
+                                    <i class="fas fa-square"></i>全解除
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 凡例 -->
+                <p class="panel-title theme-display" style="margin-top:14px;">凡例</p>
+                <div class="data-category theme-display">
+                    <div class="category-header" onclick="toggleDataCategory(this)">
+                        <div class="category-icon">
+                            <i class="fas fa-palette"></i>
+                            <span>凡例</span>
+                        </div>
+                        <i class="fas fa-chevron-down category-toggle"></i>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-content-wrapper">
+                            <div class="mg-legend-list">
+                                <div class="mg-legend-item">
+                                    <div class="mg-legend-swatch normal"></div>通常作業
+                                </div>
+                                <div class="mg-legend-item">
+                                    <div class="mg-legend-swatch monitor"></div>監視作業
+                                </div>
+                                <div class="mg-legend-item">
+                                    <div class="mg-legend-swatch hold"></div>保持作業
+                                </div>
+                                <div class="mg-legend-item">
+                                    <div class="mg-legend-swatch wait"></div>手待ち
+                                </div>
+                                <div class="mg-legend-item">
+                                    <div class="mg-legend-swatch auto"></div>自動送り時間
+                                </div>
+                                <div class="mg-legend-item">
+                                    <div class="mg-legend-swatch walk"></div>歩行時間
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ======================= -->
+            <!--      共通セクション     -->
+            <!-- ======================= -->
+            <div id="commonPanelSection">
+
+                <!-- パネル内サブタブナビ（共通） -->
+                <div class="panel-sub-nav panel-sub-nav--common">
+                    <button class="panel-sub-tab active" onclick="switchPanelTab('common', 'Data', this)">
+                        <i class="fas fa-database"></i>データ管理
+                    </button>
+                    <button class="panel-sub-tab" onclick="switchPanelTab('common', 'System', this)">
+                        <i class="fas fa-cog"></i>システム管理
+                    </button>
+                </div>
+
+                <!-- ── データ管理タブ ── -->
+                <div class="panel-sub-content active" id="commonDataPanel">
+
+                    <!-- 全件バックアップ -->
+                    <div class="data-category">
+                        <div class="category-header active frequency-high" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-database"></i>
+                                <span>全件バックアップ</span>
+                            </div>
+                            <div class="info-badge">全件対象</div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content active">
+                            <div class="category-content-wrapper">
+                                <p class="data-scope-note"><i class="fas fa-layer-group"></i>保存済み一覧の<strong>全データ</strong>が対象</p>
+                                <div class="data-action-grid two-column">
+                                    <button class="btn btn-all-export" onclick="exportAllData()" title="全件をJSONとして書き出し"><i class="fas fa-file-export"></i>全件書き出し</button>
+                                    <button class="btn btn-all-import" onclick="importAllData()" title="全件バックアップを読み込む"><i class="fas fa-file-import"></i>全件読み込み</button>
+                                </div>
+                                <p class="data-danger-note"><i class="fas fa-exclamation-triangle"></i>全件読み込みは既存データをすべて置き換えます</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CSV 読み書き（作業項目データ専用） -->
+                    <div class="data-category">
+                        <div class="category-header frequency-medium" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-table"></i>
+                                <span>CSV 読み書き</span>
+                            </div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <div class="csv-scope-badge">
+                                    <i class="fas fa-pen-to-square"></i>
+                                    現在の<strong>作業項目データ</strong>が対象
+                                </div>
+                                <div class="csv-main-actions">
+                                    <button class="csv-action-btn csv-write-btn" onclick="exportCurrentDataAsCSV()" title="現在の作業項目をCSVとして書き出し">
+                                        <span class="csv-btn-arrow">↓</span>
+                                        <span class="csv-btn-body"><span class="csv-btn-label">書き出し</span><span class="csv-btn-sub">CSVとして保存</span></span>
+                                    </button>
+                                    <button class="csv-action-btn csv-read-btn" onclick="selectCSVFile()" title="CSVファイルを選択して読み込み">
+                                        <span class="csv-btn-arrow">↑</span>
+                                        <span class="csv-btn-body"><span class="csv-btn-label">読み込み</span><span class="csv-btn-sub">ファイルを選択</span></span>
+                                    </button>
+                                </div>
+                                <div class="csv-drop-zone" id="csvMenuDropZone" onclick="selectCSVFile()" title="クリックでファイル選択、またはCSVをドラッグ＆ドロップ">
+                                    <i class="fas fa-file-import csv-drop-icon"></i>
+                                    <span class="csv-drop-text">ドラッグ＆ドロップで直接読み込み</span>
+                                </div>
+                                <details class="csv-ref-details">
+                                    <summary class="csv-ref-summary">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>フォーマット確認・サンプル</span>
+                                        <i class="fas fa-chevron-down csv-ref-chevron"></i>
+                                    </summary>
+                                    <div class="csv-ref-body">
+                                        <div class="csv-col-guide">
+                                            <div class="csv-col-item csv-col-required"><span class="csv-col-num">①</span><span class="csv-col-name">作業項目名</span><span class="csv-col-type">文字列</span></div>
+                                            <div class="csv-col-item csv-col-required"><span class="csv-col-num">②</span><span class="csv-col-name">手作業時間</span><span class="csv-col-type">秒</span></div>
+                                            <div class="csv-col-item csv-col-required"><span class="csv-col-num">③</span><span class="csv-col-name">自動送り時間</span><span class="csv-col-type">秒</span></div>
+                                            <div class="csv-col-item csv-col-required"><span class="csv-col-num">④</span><span class="csv-col-name">歩行時間</span><span class="csv-col-type">秒</span></div>
+                                            <div class="csv-col-item csv-col-optional"><span class="csv-col-num">⑤</span><span class="csv-col-name">作業分類</span><span class="csv-col-type">省略可</span></div>
+                                        </div>
+                                        <p class="csv-ref-note"><i class="fas fa-lightbulb"></i>②③いずれかが1秒以上必要。分類：normal / monitor / hold / wait</p>
+                                        <div class="csv-sample-row">
+                                            <span class="csv-sample-label">サンプル取得：</span>
+                                            <button class="btn csv-sample-btn" onclick="generateMinimalCSVSample()"><i class="fas fa-file-alt"></i>基本</button>
+                                            <button class="btn csv-sample-btn" onclick="generateCSVSample()"><i class="fas fa-file-csv"></i>詳細</button>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- サンプルデータ -->
+                    <div class="data-category">
+                        <div class="category-header frequency-low" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-flask"></i>
+                                <span>サンプルデータ</span>
+                            </div>
+                            <div class="info-badge">学習用</div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <div class="data-action-grid">
+                                    <button class="btn btn-sample" onclick="initiateSampleDataLoad()" title="作業例データを読み込み"><i class="fas fa-flask"></i>サンプル読込</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /commonDataPanel -->
+
+                <!-- ── システム管理タブ ── -->
+                <div class="panel-sub-content" id="commonSystemPanel">
+
+                    <!-- リセット操作 -->
+                    <div class="data-category danger-section">
+                        <div class="category-header frequency-low" onclick="toggleDataCategory(this)">
+                            <div class="category-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>リセット操作</span>
+                            </div>
+                            <div class="info-badge danger-badge">注意</div>
+                            <i class="fas fa-chevron-down category-toggle"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="category-content-wrapper">
+                                <div class="data-action-grid">
+                                    <button class="btn btn-danger" onclick="clearAllData()" title="すべてのデータを削除（この操作は取り消せません）"><i class="fas fa-eraser"></i>全データクリア</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /commonSystemPanel -->
+
+            </div><!-- /commonPanelSection -->
+
+        </div>
+
+        <div class="main-content">
+            <!-- ガントチャートタブ -->
+            <div id="ganttTabContent" class="main-tab-content active">
+                <!-- 基本設定表示エリア -->
+                <div class="basic-settings-area">
+                    <div class="settings-grid">
+
+                        <!-- ============================================================
+                             入力グループ: ユーザーが編集する5つの基本設定カード
+                             認知設計: 入力操作が必要な情報を左側に集約（視線の流れに沿う）
+                        ============================================================ -->
+                        <div class="settings-input-group">
+
+                            <div class="setting-card">
+                                <div class="setting-icon">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">製品名</label>
+                                    <input type="text" id="productName" class="setting-input" placeholder="製品名を入力">
+                                </div>
+                            </div>
+
+                            <div class="setting-card">
+                                <div class="setting-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">作業者名</label>
+                                    <input type="text" id="operatorName" class="setting-input" placeholder="作業者名を入力">
+                                </div>
+                            </div>
+
+                            <div class="setting-card">
+                                <div class="setting-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">稼働時間 (分/日)</label>
+                                    <input type="number" id="operatingTime" class="setting-input" value="420" min="1" step="1">
+                                </div>
+                            </div>
+
+                            <div class="setting-card">
+                                <div class="setting-icon">
+                                    <i class="fas fa-cubes"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">必要数 (個/日)</label>
+                                    <input type="number" id="requiredQuantity" class="setting-input" value="800" min="1" step="1">
+                                </div>
+                            </div>
+
+                            <div class="setting-card standard-wip-card" id="standardWIPCard">
+                                <div class="setting-icon standard-wip-icon">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">
+                                        標準手持ち (個)
+                                        <!-- 課題6: WIP不一致アラートバッジ（非表示で待機） -->
+                                        <span id="wipMismatchAlert"
+                                              class="wip-mismatch-badge"
+                                              style="display:none;"
+                                              title="">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </span>
+                                    </label>
+                                    <input type="number" id="standardWIPInput"
+                                           class="setting-input setting-input--wip"
+                                           min="0" max="99" value="0"
+                                           oninput="onStandardWIPChange()">
+                                    <span id="standardWIPLotCount" style="display:none;"></span>
+                                </div>
+                            </div>
+
+                        </div><!-- /settings-input-group -->
+
+                        <!-- ============================================================
+                             KPIグループ: システムが算出する2つの指標カード
+                             認知設計: 右側に分離して「確認するもの」として視覚的に区別
+                             セパレーター(border-left)でゾーン境界を明示
+                        ============================================================ -->
+                        <div class="settings-kpi-group">
+
+                            <!-- まとめづくりカード（課題4: 左パネルから移動） -->
+                            <div class="setting-card batch-kpi-card">
+                                <div class="setting-icon batch-kpi-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <div class="setting-content" style="flex:1; min-width:0;">
+                                    <label class="setting-label">
+                                        まとめ数
+                                        <span id="batchModeBadge" class="batch-mode-badge batch-mode-off" style="margin-left:4px;">OFF</span>
+                                    </label>
+                                    <input type="number" id="batchQuantityInput"
+                                           class="setting-input setting-input--batch"
+                                           min="1" max="999" value="1"
+                                           oninput="onBatchInputChange()">
+                                    <!-- 有効時のみ表示する追加設定 -->
+                                    <div id="batchSettingsContainer" style="display:none; margin-top:6px;">
+                                        <div class="display-toggle-row" style="margin-bottom:2px;">
+                                            <label for="batchIndivLinesChk" class="display-toggle-label" style="font-size:11px;">
+                                                <span>T/T補助線</span>
+                                            </label>
+                                            <label class="slide-switch">
+                                                <input type="checkbox" id="batchIndivLinesChk" checked
+                                                       onchange="updateBatchSettings()">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="setting-card takt-time-card">
+                                <div class="setting-icon takt-icon">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">タクトタイム</label>
+                                    <div class="takt-time-value">
+                                        <span id="taktTimeDisplay">36s</span>
+                                    </div>
+                                    <!-- まとめ数ON時: 描画T/T情報 -->
+                                    <div id="batchTTRow" style="display:none; margin-top:3px;">
+                                        <span style="font-size:11px; font-weight:600; color:#d97706; font-family:'Consolas','Monaco',monospace;">
+                                            <span id="batchTTLabel">2T/T</span>
+                                            <span id="batchTTValue" style="margin-left:2px;"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="setting-card cycle-time-integrated-card" id="mainTotalWorkTimeCard">
+                                <div class="setting-icon total-work-icon">
+                                    <i class="fas fa-stopwatch"></i>
+                                </div>
+                                <div class="setting-content">
+                                    <label class="setting-label">サイクルタイム</label>
+
+                                    <!-- チャートと同じ計算ロジック（targetScope・workOrder考慮）で表示 -->
+                                    <div class="cycle-time-display">
+                                        <!-- 行①: モードバッジ + 実C/T + まとめ換算バッジ -->
+                                        <div class="ct-primary-row">
+                                            <span class="cycle-time-mode" id="cycleTimeMode">改善前</span>
+                                            <span id="mainTotalTimeDisplay" class="main-cycle-time">0s</span>
+                                            <!-- まとめづくりON時のみ表示 -->
+                                            <span class="batch-inline-badge" id="batchInlineBadge" style="display:none;">
+                                                <span class="batch-badge-label">まとめ</span>
+                                                <span class="batch-badge-time" id="batchBadgeTime">0s</span>
+                                                <span class="batch-badge-note" id="batchBadgeNote">/個</span>
+                                            </span>
+                                        </div>
+                                        <!-- 行①b: 頻度作業ピルトグル + 込みC/T表示エリア -->
+                                        <!-- 認知心理学 Stateful Button Pattern:
+                                             ボタン文字自体が状態を示し、スペース効率と認知効率を両立 -->
+                                        <div class="freq-ct-area" id="freqToggleRow" style="display:none;">
+                                            <!-- ON時のみ表示: 頻度込みC/T値（メインCTと同サイズ） -->
+                                            <div class="freq-ct-value-row" id="freqIncludedRow" style="display:none;">
+                                                <span class="freq-included-time-large" id="freqIncludedTime">0s</span>
+                                                <span class="freq-included-delta-sm" id="freqIncludedDelta" style="display:none;"></span>
+                                                <span class="freq-over-icon" id="freqIncludedAlert" style="display:none;" title="T/Tを超過しています">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                </span>
+                                            </div>
+                                            <!-- ピルトグルボタン（常時表示） -->
+                                            <button id="freqToggleBtn"
+                                                    class="freq-pill-btn"
+                                                    onclick="toggleFreqIncludedDisplay()"
+                                                    title="頻度作業の影響時間を含めたサイクルタイムを表示/非表示">
+                                                <i class="fas fa-redo-alt"></i>
+                                                <span id="freqIncludedLabel">頻度作業含まず</span>
+                                            </button>
+                                        </div>
+                                        <!-- 行③: 改善効果（改善後・併記モード時のみ） -->
+                                        <div class="improvement-summary-inline" id="improvementSummary" style="display: none;">
+                                            <span class="improvement-compact">
+                                                短縮：<span class="improvement-value" id="timeReductionCompact">-</span>　
+                                                効率：<span class="improvement-value" id="efficiencyGainCompact">-</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div><!-- /settings-kpi-group -->
+
+                    </div>
+                </div>
+
+                <!-- 工程管理・ガント・頻度チャート共有横スクロールラッパー -->
+                <!-- スケール完全一致のため、3チャートを同一スクロール領域で管理 -->
+                <div id="chartsScrollWrapper" class="charts-scroll-wrapper">
+
+                <!-- 工程確認チャートエリア -->
+                <div class="chart-container" id="processChartContainer" style="display: none;">
+                    <!-- 工程確認 空状態ゾーン（workItemsが0件時に表示） -->
+                    <div id="processGhostZone" class="process-empty-state" style="display:none;">
+                        <div class="pes-inner">
+                            <i class="fas fa-project-diagram pes-icon"></i>
+                            <span class="pes-text">工程確認チャート</span>
+                            <span class="pes-divider"></span>
+                            <span class="pes-hint">標準作業を登録するとここに表示されます</span>
+                        </div>
+                    </div>
+                    <!-- WIP不一致警告オーバーレイ -->
+                    <div id="processChartWIPAlert" class="process-chart-wip-alert" style="display:none;" role="alert" aria-live="polite">
+                        <span class="process-wip-alert-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                        <span class="process-wip-alert-text">手持ち不一致</span>
+                        <button class="process-wip-alert-btn" onclick="openWIPMismatchResolver()" title="不一致の詳細と修正">修正する</button>
+                    </div>
+                    <div class="canvas-container" id="processCanvasContainer">
+                        <canvas id="processCanvas"></canvas>
+                        <!-- 工程確認チャート表示モード切替オーバーレイ -->
+                        <div class="frequency-mode-overlay" id="processLotModeOverlay">
+                            <button class="dm-toggle active" id="processLotBtn"
+                                    onclick="switchProcessChartLotMode('lot')"
+                                    title="ロット単位で行を分けて表示（各ロットの時間推移を独立した行で確認）">
+                                <i class="fas fa-layer-group"></i><span>ロット</span>
+                            </button>
+                            <button class="dm-toggle" id="processCycleBtn"
+                                    onclick="switchProcessChartLotMode('cycle')"
+                                    title="1サイクルを1行に集約して表示（バー内にロット番号を表示）">
+                                <i class="fas fa-sync-alt"></i><span>サイクル</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ガントチャートエリア -->
+                <!-- data-empty="true": 未入力状態（CSS制御の起点） -->
+                <div class="chart-container" id="ganttChartContainer" data-empty="true">
+                    <!-- 標準作業 新規追加ゾーン（data-empty="true"時に表示） -->
+                    <div id="ganttAddGhostZone" class="gantt-empty-state" title="ダブルクリックでも作業項目を追加できます" ondblclick="openWorkModal(null)">
+                        <div class="ges-inner">
+                            <div class="ges-icon-ring">
+                                <i class="fas fa-stream"></i>
+                            </div>
+                            <div class="ges-body">
+                                <h3 class="ges-title">標準作業組合せ票を作成しましょう</h3>
+                                <p class="ges-desc">作業項目を登録して、サイクルタイムとタクトタイムを可視化します</p>
+                                <div class="ges-steps">
+                                    <div class="ges-step">
+                                        <span class="ges-step-num">1</span>
+                                        <span class="ges-step-text">製品名・作業者を設定</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right ges-step-arr"></i>
+                                    <div class="ges-step">
+                                        <span class="ges-step-num">2</span>
+                                        <span class="ges-step-text">作業項目を追加</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right ges-step-arr"></i>
+                                    <div class="ges-step">
+                                        <span class="ges-step-num">3</span>
+                                        <span class="ges-step-text">改善前後を比較</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ges-actions">
+                                <button class="ges-btn-primary" onclick="event.stopPropagation(); openWorkModal(null)">
+                                    <i class="fas fa-plus"></i>
+                                    最初の作業を追加
+                                </button>
+                                <button class="ges-btn-secondary" onclick="event.stopPropagation(); if(typeof loadSampleData==='function') loadSampleData()">
+                                    <i class="fas fa-flask"></i>
+                                    サンプルで試す
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- キャンバスエリア（data-empty="true"時に非表示） -->
+                    <div class="canvas-container" id="canvasContainer">
+                        <canvas id="ganttCanvas"></canvas>
+                        <div class="chart-row-highlight" id="chartHighlight"></div>
+                        <!-- 表示モード切替オーバーレイ（チャート左上） -->
+                        <div class="display-mode-overlay" id="displayModeOverlay">
+                            <button class="dm-toggle active" id="dmCurrentBtn"
+                                    onclick="toggleDisplayModeButton('current')"
+                                    title="改善前データの表示／非表示">
+                                <i class="fas fa-tasks"></i><span>改善前</span>
+                            </button>
+                            <button class="dm-toggle" id="dmImprovedBtn"
+                                    onclick="toggleDisplayModeButton('improved')"
+                                    title="改善後データの表示／非表示">
+                                <i class="fas fa-rocket"></i><span>改善後</span>
+                            </button>
+                        </div>
+                        <!-- 自動送り干渉アラートバッジ（ドラッグ移動可能・標準作業組合せ票に表示） -->
+                        <div id="ganttAutoFeedConflictBadge"
+                             class="gantt-autofeed-conflict-badge"
+                             style="display:none;"
+                             role="alert"
+                             aria-live="polite"
+                             aria-label="自動送り干渉検出アラート">
+                            <i class="fas fa-exclamation-triangle gafc-icon"></i>
+                            <div class="gafc-body">
+                                <div class="gafc-headline">自動送り干渉</div>
+                                <div class="gafc-details"></div>
+                            </div>
+                            <button class="gafc-close" title="閉じる（データ変更時に自動復活）" aria-label="閉じる">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 頻度作業チャートエリア -->
+                <div class="chart-container" id="frequencyChartContainer" style="display: none;">
+                    <!-- 頻度作業 新規追加ゾーン（0件時: ゴーストゾーン表示、canvas非表示） -->
+                    <div id="frequencyAddGhostZone" class="frequency-empty-state" style="display:none;" ondblclick="openFrequencyWorkModal()">
+                        <div class="fes-inner">
+                            <div class="fes-icon-ring">
+                                <i class="fas fa-redo-alt"></i>
+                            </div>
+                            <div class="fes-body">
+                                <h3 class="fes-title">頻度作業チャートを作成しましょう</h3>
+                                <p class="fes-desc">定期的に発生する作業（定期点検・抜き取り検査など）を登録して、<br>標準サイクルへの影響を分析します</p>
+                                <p class="fes-context-hint" id="freqEmptyHint"></p>
+                            </div>
+                            <div class="fes-actions">
+                                <button class="fes-btn-primary" onclick="event.stopPropagation(); openFrequencyWorkModal()">
+                                    <i class="fas fa-plus"></i>
+                                    最初の頻度作業を追加
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="canvas-container" id="frequencyCanvasContainer">
+                        <canvas id="frequencyCanvas"></canvas>
+                        <!-- 頻度作業モード切替オーバーレイ（チャート横軸0位置の真上） -->
+                        <div class="frequency-mode-overlay" id="frequencyModeOverlay">
+                            <button class="dm-toggle" id="freqActualTimeBtn" onclick="switchFrequencyChartMode('actual')"
+                                    title="実際の作業時間で表示">
+                                <i class="fas fa-stopwatch"></i><span>実時間</span>
+                            </button>
+                            <button class="dm-toggle" id="freqConvertedTimeBtn" onclick="switchFrequencyChartMode('converted')"
+                                    title="標準作業1回あたりに換算した時間で表示">
+                                <i class="fas fa-exchange-alt"></i><span>換算値</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                </div><!-- /chartsScrollWrapper -->
+                
+            </div>
+
+            <!-- 作業配分表タブ -->
+            <div id="distributionTabContent" class="main-tab-content">
+                <div class="distribution-header">
+                    <h2 class="distribution-title">作業配分表</h2>
+                    <div class="distribution-controls">
+                        <div class="distribution-info">
+                            <i class="fas fa-chart-bar"></i>
+                            <span class="data-count-label">選択中:</span>
+                            <span class="data-count-value" id="selectedDataCount">0</span>
+                            <span class="data-count-unit">件</span>
+                        </div>
+
+                        <!-- ================================================
+                             表示モード: 改善前 / 改善後 独立トグルボタン
+                             認知設計：黒系=改善前, 赤系=改善後 で色体系を統一
+                        ================================================ -->
+                        <div class="dist-toolbar">
+
+                            <!-- ① 改善前 / 改善後 トグルグループ -->
+                            <div class="dist-mode-group" role="group" aria-label="表示モード選択">
+                                <button class="dist-toggle-btn dist-toggle-current active"
+                                        id="distCurrentToggle"
+                                        onclick="toggleDistributionButton('current')"
+                                        title="改善前データを表示 / 非表示（単独ON時は改善前のみ表示）">
+                                    <i class="fas fa-tasks"></i>
+                                    <span>改善前</span>
+                                </button>
+                                <button class="dist-toggle-btn dist-toggle-improved"
+                                        id="distImprovedToggle"
+                                        onclick="toggleDistributionButton('improved')"
+                                        title="改善後データを表示 / 非表示（単独ON時は改善後のみ表示）">
+                                    <i class="fas fa-rocket"></i>
+                                    <span>改善後</span>
+                                </button>
+                            </div>
+
+                            <!-- ② 併記サブモード（両方ONの時のみ表示） -->
+                            <div class="dist-combined-mode" id="distributionCombinedMode">
+                                <span class="dist-combined-label">
+                                    <i class="fas fa-layer-group"></i>表示形式
+                                </span>
+                                <div class="dist-combined-toggle">
+                                    <span class="dist-combined-opt" id="combinedOptGrouped">グループ</span>
+                                    <label class="slide-switch dist-mode-switch" title="グループ表示：各データを隣接して比較 ／ 分離表示：改善前・後を左右に分けて比較">
+                                        <input type="checkbox" id="combinedModeSwitch" onchange="toggleCombinedMode(this)">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="dist-combined-opt" id="combinedOptSeparated">分離</span>
+                                </div>
+                            </div>
+
+                            <!-- ③ 区切り線 -->
+                            <div class="dist-toolbar-sep"></div>
+
+                            <!-- ④ オプション: バラつき・項目名 -->
+                            <div class="dist-options-group" role="group" aria-label="表示オプション">
+                                <div class="dist-option-pair">
+                                    <span class="dist-option-label">バラつき</span>
+                                    <div class="dist-option-btns">
+                                        <button class="dist-option-btn active"
+                                                id="errorBarNoneBtn"
+                                                onclick="switchErrorBarMode('none')"
+                                                title="バラつきを非表示">
+                                            <i class="fas fa-minus"></i>
+                                            <span>なし</span>
+                                        </button>
+                                        <button class="dist-option-btn"
+                                                id="errorBarPersonBtn"
+                                                onclick="switchErrorBarMode('person')"
+                                                title="個人差バラつきをエラーバーで表示">
+                                            <i class="fas fa-arrows-alt-v"></i>
+                                            <span>あり</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button class="dist-option-btn dist-label-toggle"
+                                        id="distributionLabelToggle"
+                                        onclick="toggleDistributionItemLabels()"
+                                        title="グラフ内の作業項目名表示を切替">
+                                    <i class="fas fa-tag"></i>
+                                    <span>項目名</span>
+                                </button>
+                            </div>
+
+                        </div><!-- /.dist-toolbar -->
+                    </div>
+                </div>
+                <div class="distribution-chart-container">
+                    <div class="distribution-canvas-container" id="distributionCanvasContainer">
+                        <canvas id="distributionCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 稼働時間タブ -->
+            <div id="scheduleTabContent" class="main-tab-content">
+                <div class="schedule-header">
+                    <h2 class="schedule-title">稼働時間管理</h2>
+                    <div class="schedule-controls">
+                        <button class="btn btn-primary" onclick="addTimeSlot()">
+                            <i class="fas fa-plus"></i>時間帯追加
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetSchedule()">
+                            <i class="fas fa-refresh"></i>リセット
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 稼働時間設定エリア -->
+                <div class="schedule-settings-area">
+                    <div class="schedule-settings-grid">
+                        <div class="schedule-setting-card">
+                            <div class="setting-icon">
+                                <i class="fas fa-play"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">開始時間</label>
+                                <input type="time" id="scheduleStartTime" class="setting-input" value="08:00">
+                            </div>
+                        </div>
+
+                        <div class="schedule-setting-card">
+                            <div class="setting-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">稼働時間 (時間)</label>
+                                <input type="number" id="scheduleWorkHours" class="setting-input" value="8" min="1" max="24" step="0.5">
+                            </div>
+                        </div>
+
+                        <div class="schedule-setting-card schedule-end-time-card">
+                            <div class="setting-icon schedule-end-icon">
+                                <i class="fas fa-stop"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">終了時間</label>
+                                <div class="schedule-end-time-value">
+                                    <span id="scheduleEndTimeDisplay">16:00</span>
+                                    <div class="schedule-formula">= 開始時間 + 稼働時間</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="schedule-setting-card working-time-analysis-card" id="workingTimeCard">
+                            <div class="setting-icon schedule-work-icon">
+                                <i class="fas fa-business-time"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">実稼働時間</label>
+                                <div class="card-value-container">
+                                    <span class="card-value">0h00m</span>
+                                    <span class="card-percentage">(0.0%)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="schedule-setting-card working-time-analysis-card" id="netWorkingTimeCard">
+                            <div class="setting-icon schedule-work-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">正味稼働時間</label>
+                                <div class="card-value-container">
+                                    <span class="card-value">0h00m</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="schedule-setting-card working-time-analysis-card" id="netProductionTimeCard">
+                            <div class="setting-icon schedule-work-icon">
+                                <i class="fas fa-industry"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">正味生産時間</label>
+                                <div class="card-value-container">
+                                    <span class="card-value">0h00m</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="schedule-setting-card working-time-analysis-card" id="operatingRateCard">
+                            <div class="setting-icon schedule-work-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="setting-content">
+                                <label class="setting-label">可動率</label>
+                                <div class="card-value-container">
+                                    <span class="card-value">0.0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 稼働時間チャートエリア -->
+                <div class="schedule-chart-container">
+                    <div class="schedule-canvas-container" id="scheduleCanvasContainer">
+                        <canvas id="scheduleCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 比較ガントタブ -->
+            <div id="multiGanttTabContent" class="main-tab-content">
+                <div class="multi-gantt-header">
+                    <h2 class="multi-gantt-title">
+                        <i class="fas fa-users"></i>比較ガントチャート
+                    </h2>
+                    <div class="mg-header-info" id="mgHeaderInfo"></div>
+                </div>
+                <div class="multi-gantt-chart-wrapper">
+                    <div class="mg-canvas-container" id="mgCanvasContainer">
+                        <canvas id="multiGanttCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 頻度作業編集モーダル -->
+        <div id="frequencyWorkModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                        <h2 class="modal-title" id="frequencyModalTitle">頻度作業を編集</h2>
+                        <button class="btn btn-danger" id="deleteFrequencyBtn" onclick="deleteFrequencyWork()" style="display: none; padding: 4px 10px; min-width: auto; width: auto; height: 28px; font-size: 11px;" title="削除"><i class="fas fa-trash"></i> <span>削除</span></button>
+                    </div>
+                    <div class="modal-header-actions">
+                        <button class="btn btn-secondary" onclick="revertFrequencyWorkChanges()" title="元に戻す"><i class="fas fa-undo"></i> <span>元に戻す</span></button>
+                        <button class="close" onclick="closeFrequencyWorkModal()" title="保存して閉じます">×</button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="frequencyWorkName">作業名</label>
+                    <input type="text" id="frequencyWorkName" class="input-field" placeholder="頻度作業名を入力してください">
+                </div>
+
+                <!-- タブナビゲーション -->
+                <div class="tab-navigation">
+                    <button class="tab-button active" id="currentFrequencyTab" onclick="switchFrequencyTab('current')">
+                        <i class="fas fa-tasks"></i>改善前
+                    </button>
+                    <button class="tab-button" id="improvedFrequencyTab" onclick="switchFrequencyTab('improved')">
+                        <i class="fas fa-rocket"></i>改善後
+                    </button>
+                </div>
+
+                <!-- 改善前タブコンテンツ -->
+                <div id="currentFrequencyContent" class="tab-content active">
+                    <div class="time-input-section">
+                        <label class="input-group-label">作業時間</label>
+                        <table class="time-input-table">
+                            <thead>
+                                <tr><th>時間</th><th></th><th>分</th><th></th><th>秒</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="number" id="frequencyWorkTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                    <td><span class="time-separator">:</span></td>
+                                    <td><input type="number" id="frequencyWorkTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                    <td><span class="time-separator">:</span></td>
+                                    <td><input type="number" id="frequencyWorkTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="frequency-input-group">
+                        <label class="input-group-label">頻度</label>
+                        <div class="frequency-type-selector">
+                            <label><input type="radio" name="frequencyType" value="count" onchange="onFrequencyTypeChange(this.value, 'current')" checked> 標準作業N回に1回</label>
+                            <label><input type="radio" name="frequencyType" value="time" onchange="onFrequencyTypeChange(this.value, 'current')"> 時間ごと</label>
+                        </div>
+                        <div id="frequencyCountContainer_current" class="frequency-value-container">
+                            <input type="number" id="frequencyWorkCount" class="input-field" min="1" step="1" placeholder="回数を入力">
+                            <span>回に1回</span>
+                        </div>
+                        <div id="frequencyTimeContainer_current" class="frequency-value-container" style="display: none;">
+                            <input type="number" id="frequencyWorkTimeValue" class="input-field" min="1" step="1" placeholder="数値を入力">
+                            <select id="frequencyWorkTimeUnit" class="input-field">
+                                <option value="d">日</option>
+                                <option value="h">時間</option>
+                                <option value="m">分</option>
+                                <option value="s">秒</option>
+                            </select>
+                            <span>に1回</span>
+                        </div>
+                    </div>
+                    <!-- ★★★ ここからが修正箇所 ★★★ -->
+                    <div class="impact-analysis-section">
+                        <label class="input-group-label">影響度分析 (1サイクルあたり)</label>
+                        <div class="impact-display">
+                            <i class="fas fa-chart-line"></i>
+                            <span class="impact-label">影響時間:</span>
+                            <span class="impact-value" id="frequencyImpactTime_current">0s</span>
+                        </div>
+                        <div class="impact-formula" id="frequencyImpactFormula_current">
+                            計算式: -
+                        </div>
+                    </div>
+                    <!-- ★★★ 修正箇所ここまで ★★★ -->
+                </div>
+
+                <!-- 改善後タブコンテンツ -->
+                <div id="improvedFrequencyContent" class="tab-content">
+                    <div class="time-input-section">
+                        <label class="input-group-label">作業時間</label>
+                        <table class="time-input-table">
+                            <thead>
+                                <tr><th>時間</th><th></th><th>分</th><th></th><th>秒</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="number" id="improvedFrequencyWorkTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                    <td><span class="time-separator">:</span></td>
+                                    <td><input type="number" id="improvedFrequencyWorkTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                    <td><span class="time-separator">:</span></td>
+                                    <td><input type="number" id="improvedFrequencyWorkTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="frequency-input-group">
+                        <label class="input-group-label">頻度</label>
+                        <div class="frequency-type-selector">
+                            <label><input type="radio" name="improvedFrequencyType" value="count" onchange="onFrequencyTypeChange(this.value, 'improved')" checked> 標準作業N回に1回</label>
+                            <label><input type="radio" name="improvedFrequencyType" value="time" onchange="onFrequencyTypeChange(this.value, 'improved')"> 時間ごと</label>
+                        </div>
+                        <div id="frequencyCountContainer_improved" class="frequency-value-container">
+                            <input type="number" id="improvedFrequencyWorkCount" class="input-field" min="1" step="1" placeholder="回数を入力">
+                            <span>回に1回</span>
+                        </div>
+                        <div id="frequencyTimeContainer_improved" class="frequency-value-container" style="display: none;">
+                            <input type="number" id="improvedFrequencyWorkTimeValue" class="input-field" min="1" step="1" placeholder="数値を入力">
+                            <select id="improvedFrequencyWorkTimeUnit" class="input-field">
+                                <option value="d">日</option>
+                                <option value="h">時間</option>
+                                <option value="m">分</option>
+                                <option value="s">秒</option>
+                            </select>
+                            <span>に1回</span>
+                        </div>
+                    </div>
+                    <!-- ★★★ ここからが修正箇所 ★★★ -->
+                    <div class="impact-analysis-section">
+                        <label class="input-group-label">影響度分析 (1サイクルあたり)</label>
+                        <div class="impact-display">
+                            <i class="fas fa-chart-line"></i>
+                            <span class="impact-label">影響時間:</span>
+                            <span class="impact-value" id="frequencyImpactTime_improved">0s</span>
+                        </div>
+                        <div class="impact-formula" id="frequencyImpactFormula_improved">
+                            計算式: -
+                        </div>
+                    </div>
+                    <!-- ★★★ 修正箇所ここまで ★★★ -->
+                </div>
+
+                <div class="input-group">
+                    <label for="frequencyWorkNotes">備考</label>
+                    <textarea id="frequencyWorkNotes" class="input-field" rows="3" placeholder="追加情報があれば入力してください"></textarea>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- CSVインポート プレビュー確認モーダル -->
+    <div id="csvImportModal" class="modal">
+        <div class="modal-content csv-preview-modal">
+            <div class="modal-header">
+                <div class="csv-preview-modal-title">
+                    <i class="fas fa-table" style="color:var(--success-color);font-size:18px;"></i>
+                    <h2 class="modal-title">CSV 読み込み確認</h2>
+                </div>
+                <button class="close" onclick="closeCsvImportModal()">×</button>
+            </div>
+            <div class="csv-preview-summary">
+                <div class="csv-preview-count-block">
+                    <span class="csv-preview-count-num" id="csvPreviewCount">0</span>
+                    <span class="csv-preview-count-label">件の作業項目が見つかりました</span>
+                </div>
+                <div class="csv-preview-skipped" id="csvPreviewSkipped" style="display:none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="csvPreviewSkippedText"></span>
+                </div>
+            </div>
+            <div class="csv-preview-table-wrap">
+                <div class="csv-preview-table-label"><i class="fas fa-eye"></i> 内容プレビュー（先頭5件）</div>
+                <table class="csv-preview-table" id="csvPreviewTable">
+                    <thead><tr><th>#</th><th>作業項目名</th><th>手作業</th><th>自動送り</th><th>歩行</th><th>分類</th></tr></thead>
+                    <tbody id="csvPreviewTableBody"></tbody>
+                </table>
+                <p class="csv-preview-more" id="csvPreviewMore" style="display:none;"></p>
+            </div>
+            <div class="csv-preview-impact">
+                <i class="fas fa-exchange-alt"></i>
+                現在の作業項目 <strong><span id="csvPreviewCurrentCount">0</span> 件</strong> が
+                読み込んだ <strong><span id="csvPreviewNewCount">0</span> 件</strong> に置き換えられます
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCsvImportModal()"><i class="fas fa-times"></i> キャンセル</button>
+                <button class="btn btn-success" id="csvImportConfirmBtn" onclick="confirmCSVImport()"><i class="fas fa-check"></i> この内容で読み込む</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 作業項目編集モーダル -->
+    <div id="workModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                    <h2 class="modal-title" id="modalTitle">作業項目を編集</h2>
+                    <button class="btn btn-danger" id="deleteBtn" onclick="deleteWork()" style="display: none; padding: 4px 10px; min-width: auto; width: auto; height: 28px; font-size: 11px;" title="削除"><i class="fas fa-trash"></i> <span>削除</span></button>
+                </div>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary" onclick="revertWorkChanges()" title="元に戻す"><i class="fas fa-undo"></i> <span>元に戻す</span></button>
+                    <button class="btn btn-primary" id="saveAndCloseBtn" onclick="closeWorkModal()" style="display: none;" title="変更を確定して閉じます"><i class="fas fa-check"></i> <span>保存</span></button>
+                    <button class="close" id="workModalCloseBtn" onclick="closeWorkModal()" title="閉じます"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <!-- 標準作業組合せ票 シートスイッチャー（認知心理学：再認優先・文脈維持） -->
+            <div id="sheetSwitcherBar" style="display:none;flex-direction:row;align-items:center;gap:8px;padding:6px 16px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;min-height:36px;box-sizing:border-box;overflow:hidden;"></div>
+
+            <!-- WIP不一致警告バナー（工程内分類が標準手持ちを超えている場合に表示） -->
+            <div id="modalWIPMismatchBanner" class="modal-wip-banner" style="display:none;" role="alert" aria-live="assertive">
+                <div class="modal-wip-banner-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="modal-wip-banner-body">
+                    <p class="modal-wip-banner-title">工程内分類と標準手持ちが一致していません</p>
+                    <p class="modal-wip-banner-desc" id="modalWIPMismatchText"></p>
+                </div>
+                <button class="modal-wip-banner-btn" onclick="fixModalLotToAllowed()">
+                    <i class="fas fa-wrench"></i> 当ロットに修正
+                </button>
+            </div>
+            
+            <div class="input-group">
+                <label for="workName">作業内容</label>
+                <input type="text" id="workName" class="input-field" placeholder="作業内容を入力してください">
+            </div>
+
+            <!-- 分類選択 - 横3列レイアウト（凡例付き） -->
+            <div class="classification-grid">
+                <div class="classification-row">
+                    <div class="input-group">
+                        <label for="workCategory">作業分類</label>
+                        <div class="category-select-container">
+                            <select id="workCategory" class="input-field compact-select category-select" onchange="handleCategoryChange()">
+                                <option value="normal">通常</option>
+                                <option value="monitor">監視</option>
+                                <option value="hold">保持</option>
+                                <option value="wait">手待ち</option>
+                            </select>
+                            <div class="category-legend-preview" id="categoryLegendPreview">
+                                <div class="legend-line legend-manual"></div>
+                            </div>
+                        </div>
+                        <div class="category-description" id="categoryDescription">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="workTargetScope">対象区分</label>
+                        <select id="workTargetScope" class="input-field compact-select" onchange="handleTargetScopeChange()">
+                            <option value="common">共通</option>
+                            <option value="current-only">改善前のみ</option>
+                            <option value="improved-only">改善後のみ</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="workProcess">工程内分類</label>
+                        <select id="workProcess" class="input-field compact-select">
+                            <option value="lot1">当ロット</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- タブナビゲーション -->
+            <div class="tab-navigation">
+                <button class="tab-button active" id="currentTab" onclick="switchTab('current')">
+                    <i class="fas fa-tasks"></i>改善前
+                </button>
+                <button class="tab-button" id="improvedTab" onclick="switchTab('improved')">
+                    <i class="fas fa-rocket"></i>改善後
+                </button>
+            </div>
+
+            <!-- 改善前タブコンテンツ -->
+            <div id="currentContent" class="tab-content active">
+                <!-- 時間入力セクション -->
+                <div class="time-input-section">
+                    <table class="time-input-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>時間</th>
+                                <th></th>
+                                <th>分</th>
+                                <th></th>
+                                <th>秒</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="manualTimeLabel">手作業時間</td>
+                                <td><input type="number" id="manualTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="manualTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="manualTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                            <tr id="autoTimeRow">
+                                <td>自動送り時間</td>
+                                <td><input type="number" id="autoTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="autoTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="autoTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td>歩行時間</td>
+                                <td><input type="number" id="walkTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="walkTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="walkTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="time-input-help">歩行時間：次の作業場所までの移動時間</div>
+                </div>
+            </div>
+
+            <!-- 改善後タブコンテンツ -->
+            <div id="improvedContent" class="tab-content">
+                <!-- 時間入力セクション -->
+                <div class="time-input-section">
+                    <table class="time-input-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>時間</th>
+                                <th></th>
+                                <th>分</th>
+                                <th></th>
+                                <th>秒</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="improvedManualTimeLabel">手作業時間</td>
+                                <td><input type="number" id="improvedManualTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="improvedManualTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="improvedManualTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                            <tr id="improvedAutoTimeRow">
+                                <td>自動送り時間</td>
+                                <td><input type="number" id="improvedAutoTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="improvedAutoTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="improvedAutoTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td>歩行時間</td>
+                                <td><input type="number" id="improvedWalkTimeHours" class="time-component" min="0" max="23" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="improvedWalkTimeMinutes" class="time-component" min="0" max="59" value="0"></td>
+                                <td><span class="time-separator">:</span></td>
+                                <td><input type="number" id="improvedWalkTimeSeconds" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="time-input-help">歩行時間：次の作業場所までの移動時間</div>
+                </div>
+            </div>
+
+            <!-- 統合スライダー（両タブ共通） -->
+            <div class="unified-slider-section">
+                <label class="slider-section-label">時間調整スライダー</label>
+                <div class="slider-container">
+                    <input type="range" id="unifiedTimeSlider" class="unified-time-slider" min="0" max="59" value="0" step="1">
+                    <div class="slider-labels">
+                        <span>0</span>
+                        <span id="sliderMiddleLabel">30</span>
+                        <span id="sliderMaxLabel">59</span>
+                    </div>
+                    <div class="slider-help">フォーカス中の入力欄に値を設定 (最大値: <span id="sliderMaxDisplay">59</span>)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 時間帯編集モーダル -->
+    <div id="timeSlotModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="timeSlotModalTitle">時間帯を編集</h2>
+                <button class="close" onclick="closeTimeSlotModal()">×</button>
+            </div>
+            
+            <div class="input-group">
+                <label for="timeSlotName">時間帯名</label>
+                <input type="text" id="timeSlotName" class="input-field" placeholder="例：朝礼、休憩、点検">
+            </div>
+
+            <div class="input-group">
+                <label for="timeSlotType">分類</label>
+                <select id="timeSlotType" class="input-field">
+                    <option value="break">休憩</option>
+                    <option value="meeting">朝礼</option>
+                    <option value="inspection">点検</option>
+                    <option value="cleaning">清掃</option>
+                    <option value="setup">段替</option>
+                    <option value="chokotei">チョコ停</option>
+                    <option value="wait_time">手待ち</option>
+                    <option value="other">その他</option>
+                </select>
+            </div>
+
+            <div class="time-slot-time-grid">
+                <div class="input-group">
+                    <label for="timeSlotStartTime">開始時間</label>
+                    <input type="time" id="timeSlotStartTime" class="input-field">
+                </div>
+
+                <div class="input-group">
+                    <label for="timeSlotEndTime">終了時間</label>
+                    <input type="time" id="timeSlotEndTime" class="input-field">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="timeSlotNotes">備考</label>
+                <textarea id="timeSlotNotes" class="input-field" rows="3" placeholder="追加情報があれば入力してください"></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="deleteTimeSlotBtn" onclick="deleteTimeSlot()" style="display: none;">削除</button>
+                <button class="btn btn-secondary" onclick="closeTimeSlotModal()">キャンセル</button>
+                <button class="btn btn-primary" onclick="saveTimeSlot()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 並び替え管理モーダル -->
+    <div id="workOrderManagementModal" class="modal">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h2 class="modal-title" id="orderModalTitle">並び替え管理</h2>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary" onclick="closeWorkOrderManagement()">
+                        <i class="fas fa-undo"></i>元に戻す
+                    </button>
+                    <button class="close" onclick="confirmWorkOrderChanges()">×</button>
+                </div>
+            </div>
+            
+            <div class="order-management-content">
+                <div class="order-instructions">
+                    <i class="fas fa-info-circle"></i>
+                    ドラッグ&ドロップで順序変更。チェックして「まとめる」でグループ化（表示用）できます。
+                </div>
+                
+                <div class="order-management-actions" style="display:flex; gap:8px; margin-bottom: 10px;">
+                    <button class="btn btn-primary" onclick="groupSelectedWorkItems()" style="flex: 1;"><i class="fas fa-folder-plus"></i> 選択してまとめる</button>
+                    <button class="btn btn-secondary" onclick="ungroupSelectedWorkItems()" style="flex: 1;"><i class="fas fa-folder-minus"></i> まとめ解除</button>
+                </div>
+                
+                <div class="work-order-list" id="workOrderList">
+                    <!-- 動的に生成される作業項目リスト -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- データリスト名前入力モーダル -->
+    <div id="dataNameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">データリストに保存</h2>
+                <button class="close" onclick="closeDataNameModal()">×</button>
+            </div>
+            
+            <div class="input-group">
+                <label for="dataListName">データ名</label>
+                <input type="text" id="dataListName" class="input-field" placeholder="例: 製品A_改善案1">
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDataNameModal()">キャンセル</button>
+                <button class="btn btn-primary" onclick="confirmSaveDataToList()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- バラつきデータ編集モーダル -->
+    <div id="variabilityModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                    <h2 class="modal-title" id="variabilityModalTitle">バラつきを編集</h2>
+                    <button class="btn btn-danger" id="deleteVariabilityBtn" onclick="deleteVariability()" title="このデータのバラつき情報を削除" style="padding: 4px 10px; min-width: auto; width: auto; height: 28px; font-size: 11px;"><i class="fas fa-eraser"></i> <span>情報削除</span></button>
+                </div>
+                <div class="modal-header-actions">
+                    <button class="btn btn-secondary" id="revertVariabilityBtn" onclick="revertVariabilityChanges()" title="元に戻す"><i class="fas fa-undo"></i> <span>元に戻す</span></button>
+                    <button class="close" onclick="closeVariabilityModal()">×</button>
+                </div>
+            </div>
+            
+            <input type="hidden" id="variabilityEditingDataId">
+
+            <!-- 改善前バラつき入力 -->
+            <div class="variability-modal-section">
+                <h3 class="variability-section-title current">改善前バラつき</h3>
+                <div class="time-input-section">
+                    <table class="time-input-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>時間(h)</th>
+                                <th>分(m)</th>
+                                <th>秒(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>下限値 (-)</td>
+                                <td><input type="number" id="current_min_h" class="time-component" min="0" value="0"></td>
+                                <td><input type="number" id="current_min_m" class="time-component" min="0" max="59" value="0"></td>
+                                <td><input type="number" id="current_min_s" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                             <tr>
+                                <td>上限値 (+)</td>
+                                <td><input type="number" id="current_max_h" class="time-component" min="0" value="0"></td>
+                                <td><input type="number" id="current_max_m" class="time-component" min="0" max="59" value="0"></td>
+                                <td><input type="number" id="current_max_s" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 改善後バラつき入力 -->
+            <div class="variability-modal-section">
+                <h3 class="variability-section-title improved">改善後バラつき</h3>
+                <div class="time-input-section">
+                     <table class="time-input-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>時間(h)</th>
+                                <th>分(m)</th>
+                                <th>秒(s)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>下限値 (-)</td>
+                                <td><input type="number" id="improved_min_h" class="time-component" min="0" value="0"></td>
+                                <td><input type="number" id="improved_min_m" class="time-component" min="0" max="59" value="0"></td>
+                                <td><input type="number" id="improved_min_s" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                             <tr>
+                                <td>上限値 (+)</td>
+                                <td><input type="number" id="improved_max_h" class="time-component" min="0" value="0"></td>
+                                <td><input type="number" id="improved_max_m" class="time-component" min="0" max="59" value="0"></td>
+                                <td><input type="number" id="improved_max_s" class="time-component" min="0" max="59" value="0"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- フッターは削除 -->
+        </div>
+    </div>
+
+    <!-- ツールチップ -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <!-- コンテキストメニュー（右クリックメニュー） -->
+    <div id="chartContextMenu" class="context-menu" style="display: none;" role="menu"></div>
+
+    <!-- ドラッグフィードバック -->
+    <div id="dragFeedback" class="drag-feedback" style="display: none;"></div>
+
+    <script src="js/sample-data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/welcome.js"></script>
+    <script src="js/textposition-adjustment.js"></script>
+    <script src="js/import-export.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/chart-renderer.js"></script>
+    <script src="js/modal-manager.js"></script>
+    <script src="js/screenshot.js"></script>
+    <script src="js/multi-gantt.js"></script>
+    <script src="js/boot.js"></script>
+
+    <!-- ══════════════════════════════════════════════════════════
+         線スタイル設定 フローティングポップオーバー
+         ポップオーバーはbodyに直置きしてz-indexを確保
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="lsPopover" class="ls-popover" style="display:none;" role="dialog" aria-label="線スタイル編集"></div>
+
+    <style>
+    /* ══════════════════════════════════════════
+       線スタイル設定 コンパクトリスト（パネル内）
+    ══════════════════════════════════════════ */
+    .ls-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 8px;
+    }
+    .ls-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 4px;
+        border-radius: 6px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        transition: background .12s;
+    }
+    .ls-item:hover { background: #f1f5f9; }
+    .ls-item-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #374151;
+        min-width: 32px;
+        flex-shrink: 0;
+    }
+    .ls-item-swatch-wrap {
+        flex-shrink: 0;
+    }
+    .ls-item-swatch {
+        display: block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        border: 1.5px solid rgba(0,0,0,.15);
+    }
+    .ls-item-preview-wrap {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+    }
+    canvas.ls-preview-canvas {
+        width: 100%;
+        height: 18px;
+        display: block;
+        background: transparent;
+    }
+    .ls-item-edit-btn {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border: 1.5px solid #cbd5e1;
+        border-radius: 6px;
+        background: #fff;
+        color: #64748b;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .15s;
+    }
+    .ls-item-edit-btn:hover {
+        border-color: #6366f1;
+        color: #4f46e5;
+        background: #eef2ff;
+    }
+    .ls-item-edit-btn.ls-edit-active {
+        border-color: #4f46e5;
+        color: #4f46e5;
+        background: #e0e7ff;
+    }
+    .ls-reset-all-btn {
+        width: 100%;
+        padding: 5px 8px;
+        border: 1px dashed #d1d5db;
+        border-radius: 6px;
+        background: #f8fafc;
+        color: #9ca3af;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        transition: all .15s;
+    }
+    .ls-reset-all-btn:hover {
+        background: #fef2f2;
+        border-color: #fca5a5;
+        color: #dc2626;
+    }
+
+    /* ══════════════════════════════════════════
+       フローティングポップオーバー
+    ══════════════════════════════════════════ */
+    .ls-popover {
+        position: fixed;
+        z-index: 9999;
+        width: 234px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 8px 32px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.10);
+        font-size: 12px;
+        overflow: visible;
+        animation: lsPopIn .14s cubic-bezier(.22,.68,0,1.2);
+    }
+    @keyframes lsPopIn {
+        from { opacity:0; transform:scale(.94) translateY(-4px); }
+        to   { opacity:1; transform:scale(1)   translateY(0);    }
+    }
+    .ls-pop-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 9px 12px 8px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .ls-pop-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .ls-pop-title::before {
+        content: '';
+        display: inline-block;
+        width: 10px;
+        height: 3px;
+        border-radius: 2px;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+    .ls-pop-close {
+        width: 22px;
+        height: 22px;
+        border: none;
+        background: transparent;
+        color: #9ca3af;
+        font-size: 11px;
+        cursor: pointer;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .12s;
+    }
+    .ls-pop-close:hover { background:#f1f5f9; color:#374151; }
+    .ls-pop-body {
+        padding: 10px 12px 4px;
+    }
+    .ls-pop-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-bottom: 6px;
+    }
+    /* 色エリア */
+    .ls-pop-color-row {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .ls-pop-swatch-btn {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        border: 2px solid #e2e8f0;
+        cursor: pointer;
+        flex-shrink: 0;
+        position: relative;
+        transition: border-color .12s;
+        box-shadow: 0 1px 2px rgba(0,0,0,.12);
+    }
+    .ls-pop-swatch-btn:hover { border-color: #6366f1; }
+    .ls-hidden-picker {
+        position: absolute;
+        width: 0; height: 0;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .ls-pop-palette {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    .ls-ps {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: transform .1s, border-color .1s;
+        flex-shrink: 0;
+    }
+    .ls-ps:hover    { transform: scale(1.2); border-color: rgba(0,0,0,.25); }
+    .ls-ps--sel     { border-color: #1d4ed8 !important; box-shadow: 0 0 0 1.5px #1d4ed8; }
+    /* 線種 */
+    .ls-pop-dash-group {
+        display: flex;
+        gap: 5px;
+    }
+    .ls-db {
+        flex: 1;
+        padding: 5px 0;
+        border: 1.5px solid #d1d5db;
+        border-radius: 6px;
+        background: #fff;
+        color: #374151;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all .12s;
+    }
+    .ls-db:hover      { border-color: #6366f1; background: #eef2ff; color: #4f46e5; }
+    .ls-db--active    { border-color: #4f46e5; background: #e0e7ff; color: #3730a3;
+                        box-shadow: 0 0 0 1.5px #6366f1; }
+    /* 太さ */
+    .ls-pop-width-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .ls-pop-w-btn {
+        width: 24px;
+        height: 24px;
+        border: 1.5px solid #d1d5db;
+        border-radius: 5px;
+        background: #fff;
+        color: #374151;
+        font-size: 11px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all .12s;
+    }
+    .ls-pop-w-btn:hover { background: #f1f5f9; border-color: #6366f1; }
+    .ls-pop-slider {
+        flex: 1;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 4px;
+        border-radius: 2px;
+        background: linear-gradient(to right, #6366f1 0%, #6366f1 var(--val, 50%), #d1d5db var(--val, 50%));
+        outline: none;
+        cursor: pointer;
+    }
+    .ls-pop-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 14px; height: 14px;
+        border-radius: 50%;
+        background: #6366f1;
+        border: 2px solid #fff;
+        box-shadow: 0 1px 3px rgba(0,0,0,.2);
+        cursor: pointer;
+    }
+    .ls-pop-w-display {
+        font-size: 11px;
+        font-weight: 700;
+        color: #374151;
+        min-width: 30px;
+        text-align: right;
+        flex-shrink: 0;
+    }
+    /* フッター */
+    .ls-pop-footer {
+        padding: 8px 12px 10px;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 8px;
+    }
+    .ls-pop-reset-btn {
+        width: 100%;
+        padding: 5px;
+        border: 1px dashed #d1d5db;
+        border-radius: 6px;
+        background: #f8fafc;
+        color: #9ca3af;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        transition: all .15s;
+    }
+    .ls-pop-reset-btn:hover { background:#fef2f2; border-color:#fca5a5; color:#dc2626; }
+    </style>
+
+</body>
+</html>
