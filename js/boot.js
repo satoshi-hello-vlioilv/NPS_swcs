@@ -166,7 +166,7 @@ function createWelcomeScreenHTML() {
                     <div class="welcome-logo">
                         <i class="fas fa-tasks"></i>
                     </div>
-                    <h1 class="welcome-title">標準作業組合せ票</h1>
+                    <h1 class="welcome-title">標準作業組合せ票<span class="welcome-version">v${APP_VERSION}</span></h1>
                     <p class="welcome-subtitle">作業内容の視覚化・作業分析ツール</p>
                 </div>
                 
@@ -237,7 +237,7 @@ function createWelcomeScreenHTML() {
                     </div>
                     
                     <div class="version-info">
-                        Version 3.8.0 - Business Enhanced
+                        Version ${APP_VERSION} - Business Enhanced
                     </div>
                 </div>
             </div>
@@ -313,6 +313,12 @@ function addWelcomeScreenStyles() {
         .welcome-title {
             font-size: 28px; font-weight: 700;
             color: #1e293b; margin: 0 0 8px 0;
+        }
+        .welcome-version {
+            font-size: 14px; font-weight: 600;
+            color: #6366f1; background: #eef2ff;
+            border-radius: 999px; padding: 2px 10px;
+            margin-left: 10px; vertical-align: middle;
         }
         .welcome-subtitle {
             font-size: 16px; color: #64748b; margin: 0;

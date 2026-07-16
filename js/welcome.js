@@ -387,7 +387,7 @@ function showWelcomeModal(title, content, type = 'default') {
                 </div>
                 <div class="welcome-modal-footer">
                     <div class="modal-footer-info">
-                        <span class="modal-version">Ver 3.8.0</span>
+                        <span class="modal-version">Ver ${APP_VERSION}</span>
                     </div>
                 </div>
             </div>

@@ -1,3 +1,6 @@
+// アプリバージョン
+const APP_VERSION = '3.8.0';
+
 // グローバル変数
 // 設定・初期構成
 let taktTime = 36.0;
