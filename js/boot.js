@@ -237,7 +237,7 @@ function createWelcomeScreenHTML() {
                     </div>
                     
                     <div class="version-info">
-                        Version ${APP_VERSION} - Business Enhanced
+                        Version ${APP_VERSION}
                     </div>
                 </div>
             </div>

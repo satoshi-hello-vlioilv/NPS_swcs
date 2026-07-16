@@ -1,5 +1,5 @@
 // アプリバージョン
-const APP_VERSION = '3.8.0';
+const APP_VERSION = '1.0.0';
 
 // グローバル変数
 // 設定・初期構成
@@ -2342,7 +2342,7 @@ function getCurrentDataObject() {
         
         return {
             // バージョン情報
-            version: "4.0.0",
+            version: APP_VERSION,
             formatVersion: "enhanced-business-with-text-positions",
             
             // 基本設定
@@ -2465,7 +2465,7 @@ function getCurrentDataObject() {
         console.error('Error in getCurrentDataObject:', error);
         // フォールバック：最小限のデータオブジェクトを返す
         return {
-            version: "4.0.0",
+            version: APP_VERSION,
             formatVersion: "enhanced-business-with-text-positions",
             operatingTime: "420",
             requiredQuantity: "800",
@@ -7811,7 +7811,7 @@ function exportData() {
         data.exportMetadata = {
             exportedBy: '標準作業組合せ票',
             exportTimestamp: new Date().toISOString(),
-            applicationVersion: '3.7.0',
+            applicationVersion: APP_VERSION,
             browserInfo: navigator.userAgent,
             dataIntegrity: calculateDataChecksum(data)
         };

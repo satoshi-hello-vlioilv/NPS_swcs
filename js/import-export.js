@@ -573,7 +573,7 @@ function exportData() {
         const data = (typeof getCurrentDataObject === 'function') ? getCurrentDataObject() : {};
         data.exportMetadata = {
             exportType: 'single', exportTimestamp: new Date().toISOString(),
-            applicationVersion: '4.0.0',
+            applicationVersion: APP_VERSION,
             exportScope: ['標準作業組合せ票','工程確認チャート','頻度作業チャート','作業配分表','稼働時間データ','比較ガントチャート']
         };
         _downloadJSON(data, _buildSingleFilename(data));
@@ -599,7 +599,7 @@ function exportAllData() {
         if (typeof showProgressIndicator === 'function') showProgressIndicator('全件書き出し中...', true);
         const bundle = {
             exportType: 'all', exportTimestamp: new Date().toISOString(),
-            applicationVersion: '4.0.0', totalCount: dataList.length,
+            applicationVersion: APP_VERSION, totalCount: dataList.length,
             dataList: dataList.map(d => ({...d})),
             exportMetadata: { exportedBy: '標準作業組合せ票', exportScope: 'dataList全件バックアップ' }
         };
