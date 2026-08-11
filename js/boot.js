@@ -167,7 +167,8 @@ function createWelcomeScreenHTML() {
                     <div class="welcome-logo">
                         <i class="fas fa-tasks"></i>
                     </div>
-                    <h1 class="welcome-title">標準作業組合せ票<span class="welcome-version">v${APP_VERSION}</span></h1>
+                    <h1 class="welcome-title">標準作業組合せ票<button type="button" class="welcome-version"
+                        onclick="openChangelogModal()" title="改訂履歴を表示">v${APP_VERSION}</button></h1>
                     <p class="welcome-subtitle">作業内容の視覚化・作業分析ツール</p>
                 </div>
                 

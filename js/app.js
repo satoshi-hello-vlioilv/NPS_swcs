@@ -1,5 +1,4 @@
-// アプリバージョン
-const APP_VERSION = '1.0.0';
+// アプリバージョンと改訂履歴は js/version.js で管理する（APP_VERSION）
 
 // グローバル変数
 // 設定・初期構成

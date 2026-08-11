@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/sort-modal.css">
     <link rel="stylesheet" href="css/group.css">
     <link rel="stylesheet" href="css/multi-gantt.css">
+    <link rel="stylesheet" href="css/version.css">
     <style>
         /* =========================================
            KPI グループ：左セパレータ（border-left）を削除
@@ -197,6 +198,15 @@
     <!-- ヘッダーエリア -->
     <div class="app-header">
         <div class="header-content">
+            <!-- アプリ名とバージョンバッジ（バッジクリックで改訂履歴） -->
+            <div class="app-brand">
+                <span class="app-brand-mark" aria-hidden="true"><i class="fas fa-tasks"></i></span>
+                <span class="app-brand-name">標準作業組合せ票</span>
+                <button type="button" class="app-version-badge" id="appVersionBadge"
+                        onclick="openChangelogModal()" title="改訂履歴を表示"
+                        aria-haspopup="dialog" data-app-version="v">v–</button>
+            </div>
+
             <!-- メインタブ切り替え -->
             <div class="main-tab-navigation">
                 <button class="main-tab-button active" id="ganttTab" onclick="switchMainTab('gantt')">
@@ -2067,6 +2077,30 @@
         </div>
     </div>
 
+    <!-- 改訂履歴モーダル -->
+    <div id="changelogModal" class="modal" role="dialog" aria-modal="true"
+         aria-labelledby="changelogTitle" onclick="handleChangelogBackdrop(event)">
+        <div class="modal-content changelog-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="changelogTitle">
+                    <i class="fas fa-rotate-left"></i> 改訂履歴
+                </h2>
+                <button class="close" id="changelogCloseBtn" onclick="closeChangelogModal()"
+                        aria-label="改訂履歴を閉じる">×</button>
+            </div>
+
+            <p class="changelog-lead">
+                現在お使いのバージョンは <strong data-app-version="v">v–</strong> です。
+            </p>
+
+            <div class="changelog-body" id="changelogBody"></div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeChangelogModal()">閉じる</button>
+            </div>
+        </div>
+    </div>
+
     <!-- データリスト名前入力モーダル -->
     <div id="dataNameModal" class="modal">
         <div class="modal-content">
@@ -2178,6 +2212,7 @@
     <!-- ドラッグフィードバック -->
     <div id="dragFeedback" class="drag-feedback" style="display: none;"></div>
 
+    <script src="js/version.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/sample-data.js"></script>
     <script src="js/app.js"></script>
