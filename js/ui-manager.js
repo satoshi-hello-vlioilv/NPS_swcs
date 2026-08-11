@@ -2018,7 +2018,7 @@ function saveDataManagementState() {
             state[`category_${index}`] = isActive;
         });
         
-        localStorage.setItem('dataManagementState', JSON.stringify(state));
+        AppStorage.setItem('dataManagementState', JSON.stringify(state));
     } catch (error) {
         console.warn('Failed to save data management state:', error);
     }

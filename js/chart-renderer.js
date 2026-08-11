@@ -2520,7 +2520,7 @@ function drawDistributionChart(selectedData) {
     const timeScale = chartHeight / (maxTime * 1.1);
 
     drawDistributionLegendTop();
-    drawDistributionGrid(leftMargin, topMargin, chartHeight, maxTime, timeScale);
+    drawDistributionGrid(leftMargin, topMargin, chartHeight, maxTime, timeScale, minTaktTime);
 
     const barWidthSetting = typeof distBarWidth !== 'undefined' ? distBarWidth : 100;
     const groupSpacingSetting = typeof distGroupSpacing !== 'undefined' ? distGroupSpacing : 40;
@@ -2660,9 +2660,17 @@ function drawDistributionChart(selectedData) {
 /**
  * 作業配分表のグリッドを描画（拡張版）
  */
-function drawDistributionGrid(leftMargin, topMargin, chartHeight, maxTime, timeScale) {
+function drawDistributionGrid(leftMargin, topMargin, chartHeight, maxTime, timeScale, taktTimeValue = 0) {
     const gridSteps = 10;
     const stepValue = Math.ceil(maxTime / gridSteps / 10) * 10;
+
+    // T/Tラベルが占める縦位置。目盛ラベルがここに重なると判読できなくなるため、
+    // 近すぎる目盛ラベルは省略する（グリッド線自体は残す）。
+    // T/Tラベルは "T/T"(y-3) と時間値(y+9) の2行構成。
+    const taktY = taktTimeValue > 0
+        ? topMargin + chartHeight - (taktTimeValue * timeScale)
+        : null;
+    const TAKT_LABEL_CLEARANCE = 14;
 
     distributionCtx.strokeStyle = '#e2e8f0';
     distributionCtx.lineWidth = 1;
@@ -2686,8 +2694,11 @@ function drawDistributionGrid(leftMargin, topMargin, chartHeight, maxTime, timeS
         distributionCtx.lineTo(canvasDisplayWidth - 40, y);
         distributionCtx.stroke();
 
-        // ラベル
-        distributionCtx.fillText(formatTimeDisplay(timeValue), leftMargin - 10, y + 4);
+        // ラベル（T/Tラベルと重なる位置のものは省く）
+        const collidesWithTakt = taktY !== null && Math.abs(y - taktY) < TAKT_LABEL_CLEARANCE;
+        if (!collidesWithTakt) {
+            distributionCtx.fillText(formatTimeDisplay(timeValue), leftMargin - 10, y + 4);
+        }
     }
 
     // Y軸

@@ -1,0 +1,150 @@
+/* ============================================================
+ * icon-fallback.css ― アイコンのオフライン代替表示
+ *
+ * FontAwesome を読み込めなかった場合（社内スタンドアロンPC・
+ * オフライン環境など）に <html class="no-fa"> が付与され、
+ * 各アイコンを標準フォントの記号で代替する。
+ * 判定は index.html 内のインラインスクリプトが行う。
+ *
+ * FontAwesome 本体をローカルに同梱する場合は
+ * vendor/fontawesome/css/all.min.css を配置すれば、
+ * そちらが優先され本ファイルは作用しない。
+ * ============================================================ */
+
+html.no-fa .fas,
+html.no-fa .far,
+html.no-fa .fab,
+html.no-fa .fa {
+    font-family: inherit !important;
+    font-style: normal;
+    font-weight: 500;
+    display: inline-block;
+    min-width: 1em;
+    text-align: center;
+    line-height: 1;
+    font-variant-emoji: text;
+}
+
+/* 既定は非表示。ボタンの多くは文字ラベルを持つため、
+   意味の分からない記号を並べるより空白のほうが読みやすい。 */
+html.no-fa .fas::before,
+html.no-fa .far::before,
+html.no-fa .fab::before {
+    content: "";
+}
+
+/* 個別の代替記号 */
+html.no-fa .fa-align-left::before{content:"≡"}
+html.no-fa .fa-arrow-down::before{content:"↓"}
+html.no-fa .fa-arrow-up::before{content:"↑"}
+html.no-fa .fa-arrows-alt::before{content:"✥"}
+html.no-fa .fa-arrows-alt-h::before{content:"↔"}
+html.no-fa .fa-arrows-alt-v::before{content:"↕"}
+html.no-fa .fa-box::before{content:"▢"}
+html.no-fa .fa-boxes::before{content:"▣"}
+html.no-fa .fa-business-time::before{content:"🕔"}
+html.no-fa .fa-camera::before{content:"📷"}
+html.no-fa .fa-chart-bar::before{content:"📊"}
+html.no-fa .fa-chart-gantt::before{content:"▤"}
+html.no-fa .fa-chart-line::before{content:"📈"}
+html.no-fa .fa-check::before{content:"✓"}
+html.no-fa .fa-check-circle::before{content:"✔"}
+html.no-fa .fa-check-square::before{content:"☑"}
+html.no-fa .fa-chevron-down::before{content:"⌄"}
+html.no-fa .fa-chevron-left::before{content:"‹"}
+html.no-fa .fa-chevron-right::before{content:"›"}
+html.no-fa .fa-circle::before{content:"●"}
+html.no-fa .fa-clock::before{content:"🕐"}
+html.no-fa .fa-cloud-upload-alt::before{content:"⤒"}
+html.no-fa .fa-cog::before{content:"⚙"}
+html.no-fa .fa-compress-alt::before{content:"⤡"}
+html.no-fa .fa-compress-arrows-alt::before{content:"⤢"}
+html.no-fa .fa-copy::before{content:"⧉"}
+html.no-fa .fa-cubes::before{content:"▩"}
+html.no-fa .fa-cut::before{content:"✂"}
+html.no-fa .fa-database::before{content:"🗄"}
+html.no-fa .fa-desktop::before{content:"🖥"}
+html.no-fa .fa-download::before{content:"⤓"}
+html.no-fa .fa-edit::before{content:"✎"}
+html.no-fa .fa-eraser::before{content:"⌫"}
+html.no-fa .fa-exchange-alt::before{content:"⇄"}
+html.no-fa .fa-exclamation-circle::before{content:"❕"}
+html.no-fa .fa-exclamation-triangle::before{content:"⚠"}
+html.no-fa .fa-eye::before{content:"◉"}
+html.no-fa .fa-file::before{content:"🗋"}
+html.no-fa .fa-file-alt::before{content:"🗎"}
+html.no-fa .fa-file-csv::before{content:"🗎"}
+html.no-fa .fa-file-export::before{content:"⇥"}
+html.no-fa .fa-file-import::before{content:"⇤"}
+html.no-fa .fa-flask::before{content:"⚗"}
+html.no-fa .fa-folder::before{content:"🗀"}
+html.no-fa .fa-folder-minus::before{content:"🗀"}
+html.no-fa .fa-folder-open::before{content:"🗁"}
+html.no-fa .fa-folder-plus::before{content:"🗀"}
+html.no-fa .fa-font::before{content:"Ａ"}
+html.no-fa .fa-forward::before{content:"⏩"}
+html.no-fa .fa-hand-paper::before{content:"✋"}
+html.no-fa .fa-hashtag::before{content:"＃"}
+html.no-fa .fa-hourglass-half::before{content:"⏳"}
+html.no-fa .fa-image::before{content:"🖼"}
+html.no-fa .fa-images::before{content:"🖼"}
+html.no-fa .fa-inbox::before{content:"📥"}
+html.no-fa .fa-industry::before{content:"🏭"}
+html.no-fa .fa-info-circle::before{content:"ⓘ"}
+html.no-fa .fa-keyboard::before{content:"⌨"}
+html.no-fa .fa-layer-group::before{content:"▤"}
+html.no-fa .fa-lightbulb::before{content:"💡"}
+html.no-fa .fa-minus::before{content:"−"}
+html.no-fa .fa-palette::before{content:"🎨"}
+html.no-fa .fa-pen::before{content:"✎"}
+html.no-fa .fa-pen-ruler::before{content:"📐"}
+html.no-fa .fa-pen-to-square::before{content:"✎"}
+html.no-fa .fa-play::before{content:"▶"}
+html.no-fa .fa-plus::before{content:"＋"}
+html.no-fa .fa-plus-circle::before{content:"⊕"}
+html.no-fa .fa-print::before{content:"🖨"}
+html.no-fa .fa-project-diagram::before{content:"🕸"}
+html.no-fa .fa-question-circle::before{content:"？"}
+html.no-fa .fa-redo::before{content:"↻"}
+html.no-fa .fa-redo-alt::before{content:"↻"}
+html.no-fa .fa-refresh::before{content:"⟳"}
+html.no-fa .fa-rocket::before{content:"🚀"}
+html.no-fa .fa-rotate-left::before{content:"↺"}
+html.no-fa .fa-ruler-combined::before{content:"📐"}
+html.no-fa .fa-save::before{content:"💾"}
+html.no-fa .fa-sliders::before{content:"🎚"}
+html.no-fa .fa-sliders-h::before{content:"🎚"}
+html.no-fa .fa-sort-amount-down::before{content:"⇊"}
+html.no-fa .fa-spinner::before{content:"◌"}
+html.no-fa .fa-square::before{content:"☐"}
+html.no-fa .fa-stop::before{content:"■"}
+html.no-fa .fa-stopwatch::before{content:"⏱"}
+html.no-fa .fa-stream::before{content:"☰"}
+html.no-fa .fa-sync-alt::before{content:"⟳"}
+html.no-fa .fa-table::before{content:"▦"}
+html.no-fa .fa-tachometer-alt::before{content:"⏲"}
+html.no-fa .fa-tag::before{content:"🏷"}
+html.no-fa .fa-tasks::before{content:"☑"}
+html.no-fa .fa-text-height::before{content:"↕"}
+html.no-fa .fa-times::before{content:"✕"}
+html.no-fa .fa-times-circle::before{content:"⊗"}
+html.no-fa .fa-toggle-on::before{content:"⏻"}
+html.no-fa .fa-tools::before{content:"🛠"}
+html.no-fa .fa-trash::before{content:"🗑"}
+html.no-fa .fa-trash-alt::before{content:"🗑"}
+html.no-fa .fa-tv::before{content:"🖥"}
+html.no-fa .fa-undo::before{content:"↺"}
+html.no-fa .fa-user::before{content:"👤"}
+html.no-fa .fa-users::before{content:"👥"}
+html.no-fa .fa-wrench::before{content:"🔧"}
+
+/* 回転アニメーションはフォントに依存しないので維持する */
+html.no-fa .fa-spin {
+    animation: fa-fallback-spin 1.6s linear infinite;
+}
+@keyframes fa-fallback-spin {
+    to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+    html.no-fa .fa-spin { animation: none; }
+}

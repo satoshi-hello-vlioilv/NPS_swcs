@@ -5,8 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>標準作業組合せ票</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <!-- FontAwesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- アイコン: ローカル同梱版があればそれを使い、無ければCDNを使う。
+         どちらも読めない場合は icon-fallback.css が代替記号を表示する -->
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css"
+          onerror="this.remove(); document.getElementById('faCdn').disabled = false;">
+    <link id="faCdn" rel="stylesheet" disabled
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/icon-fallback.css">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/legend.css">
     <link rel="stylesheet" href="css/sort-modal.css">
@@ -2173,6 +2178,7 @@
     <!-- ドラッグフィードバック -->
     <div id="dragFeedback" class="drag-feedback" style="display: none;"></div>
 
+    <script src="js/storage.js"></script>
     <script src="js/sample-data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/welcome.js"></script>
@@ -2184,6 +2190,51 @@
     <script src="js/screenshot.js"></script>
     <script src="js/multi-gantt.js"></script>
     <script src="js/boot.js"></script>
+
+    <!-- アイコンが読めたかを実測し、駄目なら代替表示へ切り替える -->
+    <script>
+    (function () {
+        function probeIcons() {
+            var probe = document.createElement('i');
+            probe.className = 'fas fa-check';
+            probe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;font-size:24px;';
+            document.body.appendChild(probe);
+
+            var family = '';
+            try {
+                family = window.getComputedStyle(probe, '::before').fontFamily || '';
+            } catch (e) { /* 取得できない環境では未読込とみなす */ }
+            document.body.removeChild(probe);
+
+            // アイコン用CSSが当たっていない、またはウェブフォント本体が使えない場合
+            var cssMissing  = !/Font\s*Awesome/i.test(family);
+            var fontMissing = false;
+            try {
+                if (document.fonts && typeof document.fonts.check === 'function') {
+                    fontMissing = !document.fonts.check('16px "Font Awesome 6 Free"');
+                }
+            } catch (e) { /* 判定不能なら CSS の有無のみで決める */ }
+
+            if (cssMissing || fontMissing) {
+                document.documentElement.classList.add('no-fa');
+            }
+        }
+
+        function start() {
+            if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+                document.fonts.ready.then(probeIcons, probeIcons);
+            } else {
+                probeIcons();
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', start);
+        } else {
+            start();
+        }
+    })();
+    </script>
 
     <!-- ══════════════════════════════════════════════════════════
          線スタイル設定 フローティングポップオーバー

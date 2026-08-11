@@ -3,10 +3,11 @@
 /**
  * 拡張されたアプリケーション初期化
  */
-function initializeAppWithWelcome() {
+async function initializeAppWithWelcome() {
     try {
-        // 1. ローカルストレージからデータを先に読み込み
-        loadFromLocalStorage();
+        // 1. 保存済みデータを先に読み込む（IndexedDBのため非同期）
+        //    Welcome画面の要否はこの結果で決まるので、必ず待ってから次に進む
+        await loadFromStorage();
 
         // 2. Welcome画面の表示要否をチェック
         const shouldShow = shouldShowWelcomeScreen();
@@ -664,24 +665,32 @@ function initializeGlobalVariables() {
 }
 
 /**
- * ローカルストレージからデータを読み込み
+ * 保存済みデータを読み込む（保存先は IndexedDB / storage.js）
  */
-function loadFromLocalStorage() {
+async function loadFromStorage() {
     try {
-        const savedDataList = localStorage.getItem('workAnalysisDataList');
+        const [savedDataList, savedCurrentData, savedSelectedDataIds] = await Promise.all([
+            AppStorage.getItem('workAnalysisDataList'),
+            AppStorage.getItem('workAnalysisCurrentData'),
+            AppStorage.getItem('workAnalysisSelectedDataIds')
+        ]);
+
         if (savedDataList) {
             dataList = JSON.parse(savedDataList);
             updateDataListSelect();
             updateDataSelectionList();
         }
 
-        const savedCurrentData = localStorage.getItem('workAnalysisCurrentData');
         if (savedCurrentData) {
             const data = JSON.parse(savedCurrentData);
             loadDataFromObject(data);
+
+            // currentDataId はここで初めて確定するため、
+            // dataList 読み込み直後に行った表示更新をやり直す。
+            // これを省くと、復元済みなのに「新規データ／データなし」と表示されてしまう。
+            updateDataListSelect();
         }
 
-        const savedSelectedDataIds = localStorage.getItem('workAnalysisSelectedDataIds');
         if (savedSelectedDataIds) {
             selectedDataIds = JSON.parse(savedSelectedDataIds);
             updateDataSelectionList();
@@ -694,10 +703,13 @@ function loadFromLocalStorage() {
             _mgNotifyDataListChanged();
         }
     } catch (error) {
-        console.error('Failed to load from localStorage:', error);
+        console.error('Failed to load saved data:', error);
         showNotificationBanner('データの読み込みに失敗しました。', 'error', 2500);
     }
 }
+
+// 旧名からの呼び出しにも対応させる
+const loadFromLocalStorage = loadFromStorage;
 
 /**
  * 作業順序配列を初期化
@@ -748,9 +760,9 @@ function calculateTaktTime(showAlerts = true) {
 /**
  * データ管理セクションの状態を復元
  */
-function restoreDataManagementState() {
+async function restoreDataManagementState() {
     try {
-        const state = JSON.parse(localStorage.getItem('dataManagementState') || '{}');
+        const state = JSON.parse(await AppStorage.getItem('dataManagementState') || '{}');
         const categories = document.querySelectorAll('.data-category');
         
         categories.forEach((category, index) => {

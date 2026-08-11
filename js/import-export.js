@@ -263,16 +263,22 @@ async function importCSVFile(file) {
     try {
         showProgressIndicator('CSVを解析中...', true);
         const text = await readCSVFileWithAutoEncoding(file);
-        const lines = text.split('\n').filter(l => l.trim());
+        // 引用符内の改行を行区切りにしないよう、RFC 4180準拠で分割する
+        const lines = splitCSVRows(text).filter(l => l.trim());
         if (lines.length < 2) throw new Error('CSVファイルにデータが不足しています。');
         const { dataLines, hasHeader } = detectCSVStructure(lines);
         const items = [];
+        const skippedRows = [];
         let skipped = 0;
         for (let i = 0; i < dataLines.length; i++) {
             const line = dataLines[i].trim();
             if (!line) continue;
             const cols = parseCSVLineAdvanced(line);
-            if (cols.length < 4) { skipped++; continue; }
+            if (cols.length < 4) {
+                skipped++;
+                skippedRows.push(`${i + 1}行目: 列が${cols.length}個しかありません（4個以上必要）`);
+                continue;
+            }
 
             // 旧形式（5列）・新形式（11列）両対応
             // [0]作業項目名 [1]手作業時間 [2]自動送り時間 [3]歩行時間 [4]作業分類
@@ -287,16 +293,26 @@ async function importCSVFile(file) {
             const pm  = Math.max(0, parseInt(manualRaw) || 0);
             const pa  = Math.max(0, parseInt(autoRaw)   || 0);
             const pw  = Math.max(0, parseInt(walkRaw)   || 0);
-            if (pm === 0 && pa === 0) { skipped++; continue; }
 
             // 改善後時間（列が存在しない旧形式の場合は改善前と同値）
             const ipm = cols.length >= 8 ? Math.max(0, parseInt(impManualRaw) || 0) : pm;
             const ipa = cols.length >= 9 ? Math.max(0, parseInt(impAutoRaw)   || 0) : pa;
             const ipw = cols.length >= 10 ? Math.max(0, parseInt(impWalkRaw)  || 0) : pw;
 
+            // 名前も時間も無い行だけを除外する。
+            // 歩行だけの作業や「改善後のみ」の作業（改善前が 0,0,0 になるのが正しい）は
+            // 有効なデータなので、改善前の手作業・自動送りだけで判定してはいけない。
+            const trimmedName = (name || '').trim();
+            const hasAnyTime  = (pm + pa + pw + ipm + ipa + ipw) > 0;
+            if (!trimmedName && !hasAnyTime) {
+                skipped++;
+                skippedRows.push(`${i + 1}行目: 作業項目名と時間がどちらも空です`);
+                continue;
+            }
+
             items.push({
                 id:          Date.now() + i,
-                name:        (name || '').trim() || `作業項目${i + 1}`,
+                name:        trimmedName || `作業項目${i + 1}`,
                 manualTime:  pm, autoTime: pa, walkTime: pw,
                 category:    validateCategory(catRaw),
                 process:     validateProcess(processRaw),
@@ -309,14 +325,14 @@ async function importCSVFile(file) {
         if (items.length === 0) throw new Error('有効なデータが見つかりませんでした。');
         _csvPendingItems = items;
         _csvSkippedCount = skipped;
-        _showCSVPreviewModal(items, skipped);
+        _showCSVPreviewModal(items, skipped, skippedRows);
     } catch (error) {
         showProgressIndicator('', false);
         showNotificationBanner(`CSVエラー: ${error.message}`, 'error', 3000);
     }
 }
 
-function _showCSVPreviewModal(items, skipped) {
+function _showCSVPreviewModal(items, skipped, skippedRows = []) {
     const modal = document.getElementById('csvImportModal');
     if (!modal) return;
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
@@ -326,7 +342,14 @@ function _showCSVPreviewModal(items, skipped) {
     const skippedEl = document.getElementById('csvPreviewSkipped');
     const skippedTxt = document.getElementById('csvPreviewSkippedText');
     if (skippedEl) skippedEl.style.display = skipped > 0 ? 'flex' : 'none';
-    if (skippedTxt) skippedTxt.textContent = `${skipped}行は形式エラーでスキップされました`;
+    if (skippedTxt) {
+        // 何行目がなぜ読み込まれなかったかを具体的に示す（最大3件まで列挙）
+        const detail = skippedRows.slice(0, 3).join(' ／ ');
+        const more   = skippedRows.length > 3 ? ` ほか${skippedRows.length - 3}行` : '';
+        skippedTxt.textContent = detail
+            ? `${skipped}行を読み込めませんでした — ${detail}${more}`
+            : `${skipped}行を読み込めませんでした`;
+    }
     const tbody = document.getElementById('csvPreviewTableBody');
     const catLabels = { normal:'通常', monitor:'監視', hold:'保持', wait:'手待ち' };
     if (tbody) tbody.innerHTML = items.slice(0, 5).map((item, i) => `
@@ -485,6 +508,49 @@ function detectCSVStructure(lines) {
  * @param {string} line - CSV行
  * @returns {Array} - 解析された列の配列
  */
+/**
+ * CSV全文を行に分割する（RFC 4180準拠）
+ * 引用符で囲まれたフィールド内の改行は行区切りとして扱わない。
+ * 単純な text.split('\n') では、備考などに改行を含む行が壊れてしまう。
+ * @param {string} text - CSV全文
+ * @returns {Array<string>} - 論理行の配列
+ */
+function splitCSVRows(text) {
+    const rows = [];
+    let current  = '';
+    let inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+
+        if (char === '"') {
+            if (inQuotes && text[i + 1] === '"') {
+                // エスケープされたダブルクォート（""）は塊のまま持ち越す
+                current += '""';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+                current += char;
+            }
+            continue;
+        }
+
+        if (!inQuotes && (char === '\n' || char === '\r')) {
+            // CRLF は 2文字で 1つの改行として扱う
+            if (char === '\r' && text[i + 1] === '\n') i++;
+            rows.push(current);
+            current = '';
+            continue;
+        }
+
+        current += char;
+    }
+
+    if (current !== '') rows.push(current);
+
+    return rows;
+}
+
 function parseCSVLineAdvanced(line) {
     const result = [];
     let current = '';

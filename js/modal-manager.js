@@ -557,7 +557,14 @@ async function saveWork() {
                 id: Date.now(),
                 name, category, process, targetScope,
                 manualTime, autoTime, walkTime,
-                improved: { improvedManualTime, improvedAutoTime, improvedWalkTime }
+                // improved のキー名は manualTime / autoTime / walkTime。
+                // 変数名のままショートハンドで書くと improvedManualTime 等になり、
+                // 参照側（item.improved.manualTime）が undefined になるため明示的に対応付ける。
+                improved: {
+                    manualTime: improvedManualTime,
+                    autoTime:   improvedAutoTime,
+                    walkTime:   improvedWalkTime
+                }
             };
             workItems.push(newWork);
             addToWorkOrderWithTargetScope(newWork.id, insertPosition, targetScope);

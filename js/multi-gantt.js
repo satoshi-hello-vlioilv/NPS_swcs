@@ -261,12 +261,34 @@ function mgTimes(item, mode) {
     };
 }
 
-/** サイクルタイム合計を計算 */
+/**
+ * サイクルタイム合計を計算
+ * 作業者のサイクルは手作業＋歩行で構成される。自動送りは設備が並行して動く時間であり、
+ * 作業者側の待ちは「手待ち」項目として別に計上されているため、ここでは加算しない
+ * （標準作業組合せ票本体の cumulativeTime と同じ定義）。
+ */
 function mgCalcCycleTime(data, mode) {
     return mgGetItems(data, mode).reduce((sum, it) => {
         const t = mgTimes(it, mode);
-        return sum + t.manual + t.auto + t.walk;
+        return sum + t.manual + t.walk;
     }, 0);
+}
+
+/**
+ * 描画に必要な時間幅を計算
+ * 自動送りはサイクルタイムに含めないが、C/Tより後ろまで伸びることがあるため、
+ * 目盛りの最大値にはその終端も考慮する。
+ */
+function mgCalcSpan(data, mode) {
+    let cursor = 0;
+    let span   = 0;
+    mgGetItems(data, mode).forEach(it => {
+        const t = mgTimes(it, mode);
+        cursor += t.manual;
+        if (t.auto > 0) span = Math.max(span, cursor + t.auto);
+        cursor += t.walk;
+    });
+    return Math.max(span, cursor);
 }
 
 /** 秒 → 表示文字列（s / m / ms 形式） */
@@ -341,11 +363,12 @@ function mgRedraw() {
     // グローバルタクトタイムを基準スケールとして利用
     const tt = (typeof taktTime !== 'undefined' && taktTime > 0) ? taktTime : 60;
 
-    // X軸の最大時間 = T/T × 1.25 と全作業者C/T最大値のうち大きい方
+    // X軸の最大時間 = T/T × 1.25 と全作業者の描画幅最大値のうち大きい方
+    // （描画幅は C/T に加えて、C/T より後ろまで伸びる自動送りの終端も含む）
     let maxTime = tt * 1.25;
     selected.forEach(entry => {
-        const ct = mgCalcCycleTime(entry.data || {}, mgDisplayMode);
-        if (ct > maxTime) maxTime = ct * 1.05;
+        const span = mgCalcSpan(entry.data || {}, mgDisplayMode);
+        if (span > maxTime) maxTime = span * 1.05;
     });
 
     const numRows    = selected.length;
@@ -565,6 +588,10 @@ function mgDrawWorkerRow(ctx, entry, ri, timeScale, chartW) {
 
     let curX = MG.LEFT_MARGIN;
 
+    // 自動送りは作業者の時間を進めず、設備側で並行して動く時間として
+    // 本体バーの下に細い帯で描く。まず位置だけ集めておき、本体バーの後に描画する。
+    const autoSegs = [];
+
     items.forEach((item, itemIdx) => {
         const t = mgTimes(item, mode);
 
@@ -582,13 +609,9 @@ function mgDrawWorkerRow(ctx, entry, ri, timeScale, chartW) {
             curX += w;
         }
 
-        // ── 自動送り時間
+        // ── 自動送り時間（並行時間なので curX は進めない）
         if (t.auto > 0) {
-            const w = t.auto * timeScale;
-            if (curX + w <= chartW + 2) {
-                mgDrawAutoBar(ctx, curX, barY, w, barH, mColor, mode);
-            }
-            curX += w;
+            autoSegs.push({ x: curX, w: t.auto * timeScale });
         }
 
         // ── 歩行時間
@@ -599,6 +622,14 @@ function mgDrawWorkerRow(ctx, entry, ri, timeScale, chartW) {
             }
             curX += w;
         }
+    });
+
+    // ── 自動送りの帯（本体バーの直下）
+    const autoH = Math.max(4, barH * 0.28);
+    const autoY = barY + barH + 2;
+    autoSegs.forEach(seg => {
+        const w = Math.min(seg.w, chartW + 2 - seg.x);
+        if (w > 0.5) mgDrawAutoBar(ctx, seg.x, autoY, w, autoH, mColor, mode);
     });
 
     // ── C/Tエンドマーカー

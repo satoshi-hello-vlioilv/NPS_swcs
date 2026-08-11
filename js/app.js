@@ -1162,7 +1162,12 @@ function calculateNonWorkingTime(types) {
  */
 function updateWorkingTimeDisplay() {
     const workingTimeInfo = calculateWorkingTime();
-   
+
+    // 実稼働・正味稼働・正味生産・可動率の各カードを更新 (ui-manager.js)
+    if (typeof updateCompactWorkingTimeCards === 'function') {
+        updateCompactWorkingTimeCards(workingTimeInfo);
+    }
+
     // 稼働時間設定表示も更新 (ui-manager.js の関数があれば呼び出す)
     if (typeof updateScheduleConfigDisplay === 'function') {
         updateScheduleConfigDisplay();
@@ -2295,20 +2300,58 @@ function getTimeSlotHitTest(x, y) {
 
 
 /**
- * ローカルストレージにデータを保存
+ * データを保存する（保存先は IndexedDB / storage.js）
  */
-function saveToLocalStorage() {
+async function saveToStorage() {
     try {
-        localStorage.setItem('workAnalysisDataList', JSON.stringify(dataList));
-        
         const currentData = getCurrentDataObject();
-        localStorage.setItem('workAnalysisCurrentData', JSON.stringify(currentData));
 
-        localStorage.setItem('workAnalysisSelectedDataIds', JSON.stringify(selectedDataIds));
+        await Promise.all([
+            AppStorage.setItem('workAnalysisDataList', JSON.stringify(dataList)),
+            AppStorage.setItem('workAnalysisCurrentData', JSON.stringify(currentData)),
+            AppStorage.setItem('workAnalysisSelectedDataIds', JSON.stringify(selectedDataIds))
+        ]);
+
+        await warnIfStorageIsFilling();
     } catch (error) {
-        console.error('Failed to save to localStorage:', error);
-        showNotificationBanner('データの保存に失敗しました。', 'error', 2500);
+        console.error('Failed to save data:', error);
+
+        // 容量超過は原因と対処が分かるように文言を分ける
+        const isQuota = error && (
+            error.name === 'QuotaExceededError' ||
+            error.name === 'NS_ERROR_DOM_QUOTA_REACHED'
+        );
+        showNotificationBanner(
+            isQuota
+                ? '保存領域が上限に達したため保存できませんでした。不要なデータを削除するか、書き出してからお試しください。'
+                : 'データの保存に失敗しました。',
+            'error',
+            isQuota ? 5000 : 2500
+        );
     }
+}
+
+// 旧名からの呼び出しにも対応させる
+const saveToLocalStorage = saveToStorage;
+
+/**
+ * 保存領域の使用量が逼迫してきたら一度だけ知らせる
+ */
+let _storageWarningShown = false;
+async function warnIfStorageIsFilling() {
+    if (_storageWarningShown) return;
+    try {
+        const info = await AppStorage.estimateUsage();
+        if (info && info.ratio >= 0.8) {
+            _storageWarningShown = true;
+            const usedMB = (info.usage / 1024 / 1024).toFixed(1);
+            showNotificationBanner(
+                `保存領域の使用量が${Math.round(info.ratio * 100)}%（約${usedMB}MB）です。不要なデータの削除か、書き出しでのバックアップをおすすめします。`,
+                'warning',
+                6000
+            );
+        }
+    } catch (e) { /* 使用量を取得できない環境では何もしない */ }
 }
 
 /**
@@ -2891,10 +2934,11 @@ function loadDataFromObject(data) {
                 targetScope: item.targetScope || 'common'
             };
             
+            // improvedManualTime 等は、旧版が誤ったキー名で保存したデータの読み替え用
             restoredItem.improved = item.improved ? {
-                manualTime: Math.max(0, parseInt(item.improved.manualTime) || 0),
-                autoTime: Math.max(0, parseInt(item.improved.autoTime) || 0),
-                walkTime: Math.max(0, parseInt(item.improved.walkTime) || 0)
+                manualTime: Math.max(0, parseInt(item.improved.manualTime ?? item.improved.improvedManualTime) || 0),
+                autoTime: Math.max(0, parseInt(item.improved.autoTime ?? item.improved.improvedAutoTime) || 0),
+                walkTime: Math.max(0, parseInt(item.improved.walkTime ?? item.improved.improvedWalkTime) || 0)
             } : {
                 manualTime: restoredItem.manualTime,
                 autoTime: restoredItem.autoTime,
