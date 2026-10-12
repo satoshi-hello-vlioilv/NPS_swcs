@@ -2246,7 +2246,9 @@
             var fontMissing = false;
             try {
                 if (document.fonts && typeof document.fonts.check === 'function') {
-                    fontMissing = !document.fonts.check('16px "Font Awesome 6 Free"');
+                    // .fas は太さ900の書体を使う。太さを省くと400（.far用）の判定になり、
+                    // .far を使っていない画面では未読込のままなので常に「無い」と誤判定する
+                    fontMissing = !document.fonts.check('900 16px "Font Awesome 6 Free"');
                 }
             } catch (e) { /* 判定不能なら CSS の有無のみで決める */ }
 

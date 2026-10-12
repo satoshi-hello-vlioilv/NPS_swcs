@@ -81,6 +81,11 @@
 }
 
 /* ── 改訂履歴モーダル ──────────────────────────────────────── */
+/* Welcome画面（z-index: 5000）のバッジからも開くため、その上に出す */
+#changelogModal {
+    z-index: 6000;
+}
+
 .changelog-modal-content {
     max-width: 680px;
     width: min(680px, calc(100vw - 40px));

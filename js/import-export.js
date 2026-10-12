@@ -276,7 +276,7 @@ async function importCSVFile(file) {
             const cols = parseCSVLineAdvanced(line);
             if (cols.length < 4) {
                 skipped++;
-                skippedRows.push(`${i + 1}行目: 列が${cols.length}個しかありません（4個以上必要）`);
+                skippedRows.push(`データ${i + 1}件目: 列が${cols.length}個しかありません（4個以上必要）`);
                 continue;
             }
 
@@ -306,7 +306,7 @@ async function importCSVFile(file) {
             const hasAnyTime  = (pm + pa + pw + ipm + ipa + ipw) > 0;
             if (!trimmedName && !hasAnyTime) {
                 skipped++;
-                skippedRows.push(`${i + 1}行目: 作業項目名と時間がどちらも空です`);
+                skippedRows.push(`データ${i + 1}件目: 作業項目名と時間がどちらも空です`);
                 continue;
             }
 

@@ -62,7 +62,11 @@ const AppStorage = (() => {
             request.onsuccess = () => {
                 const db = request.result;
                 // 別タブが新しいバージョンを開いた場合は接続を閉じる
-                db.onversionchange = () => db.close();
+                // 閉じた接続を使い続けると以降の保存がすべて失敗するため、次回は開き直す
+                db.onversionchange = () => {
+                    db.close();
+                    dbPromise = null;
+                };
                 resolve(db);
             };
             request.onerror   = () => reject(request.error || new Error('IndexedDB open failed'));
@@ -193,7 +197,8 @@ const AppStorage = (() => {
 
         writeChains.set(key, next);
         // 連鎖が伸び続けないよう、完了したら破棄する
-        next.finally(() => {
+        // （finally は失敗をそのまま伝えて未処理の reject になるため、catch で受けてから片付ける）
+        next.catch(() => {}).then(() => {
             if (writeChains.get(key) === next) writeChains.delete(key);
         });
         return next;
